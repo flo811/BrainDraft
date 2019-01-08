@@ -1,6 +1,6 @@
 package braindraft.model.network;
 
-import braindraft.model.ActivationFunction;
+import braindraft.model.ActFunction;
 
 /**
  *
@@ -11,7 +11,7 @@ public class HiddenNeuron extends VirtualNeuron {
     private Layer<? extends VirtualNeuron> nextLayer;
 
     public HiddenNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
-            final ActivationFunction activationFunction, final Layer<?> previousLayer,
+            final ActFunction activationFunction, final Layer<?> previousLayer,
             final double learningRate, final double bias) {
         super(weightRangeStartMin, weightRangeStartMax, activationFunction, previousLayer, learningRate, bias);
     }
@@ -21,7 +21,7 @@ public class HiddenNeuron extends VirtualNeuron {
         final double ponderatedErrors = nextLayer.getAll().stream()
                 .mapToDouble(neuron -> neuron.getWeightWith(this) * neuron.getError())
                 .sum();
-        errorProperty.set(ponderatedErrors * activationFunction.applyDerivate(weightedSum));
+        errorProperty.set(ponderatedErrors * activationFunction.getActivationFunction().applyDerivate(weightedSum));
         biasWeight.add(learningRate * errorProperty.get());
         entriesWeight.forEach((neuron, weightProperty) -> weightProperty.add(learningRate * errorProperty.get() * neuron.getOutput()));
     }

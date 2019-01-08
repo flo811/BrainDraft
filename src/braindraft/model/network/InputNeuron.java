@@ -1,7 +1,7 @@
 package braindraft.model.network;
 
+import braindraft.model.MyDoubleProperty;
 import java.io.Serializable;
-import javafx.beans.property.SimpleDoubleProperty;
 
 /**
  *
@@ -9,14 +9,14 @@ import javafx.beans.property.SimpleDoubleProperty;
  */
 public class InputNeuron implements Outputable, Serializable {
 
-    private final SimpleDoubleProperty input = new SimpleDoubleProperty();
+    private final MyDoubleProperty input = new MyDoubleProperty();
 
     public void setInput(final double input) {
         this.input.set(input);
     }
 
     @Override
-    public SimpleDoubleProperty getOutputProperty() {
+    public MyDoubleProperty getOutputProperty() {
         return input;
     }
 

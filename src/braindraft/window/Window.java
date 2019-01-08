@@ -1,8 +1,8 @@
 package braindraft.window;
 
-import braindraft.model.network.Network;
 import braindraft.dao.NetworkDAO;
 import braindraft.model.Trainer;
+import braindraft.model.network.Network;
 import braindraft.window.frames.CreateFrame;
 import braindraft.window.frames.EmptyFrame;
 import braindraft.window.frames.NetworkFrame;
@@ -134,7 +134,7 @@ public class Window {
         try {
             final File file = fileChooser.showSaveDialog(root.getScene().getWindow());
             if (file != null) {
-                NetworkDAO.save(trainerProperty.get().getNetwork(), file);
+                NetworkDAO.save(networkProperty.get(), file);
                 modifiedProperty.set(false);
                 return true;
             }

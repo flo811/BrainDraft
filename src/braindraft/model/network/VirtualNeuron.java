@@ -1,10 +1,10 @@
 package braindraft.model.network;
 
-import braindraft.model.ActivationFunction;
+import braindraft.model.ActFunction;
+import braindraft.model.MyDoubleProperty;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.beans.property.SimpleDoubleProperty;
 
 /**
  *
@@ -12,27 +12,27 @@ import javafx.beans.property.SimpleDoubleProperty;
  */
 public abstract class VirtualNeuron implements Outputable, Serializable {
 
-    protected ActivationFunction activationFunction;
+    protected ActFunction activationFunction;
     protected double learningRate;
     protected double bias;
 
-    protected final Map<Outputable, SimpleDoubleProperty> entriesWeight = new HashMap<>();
-    protected final SimpleDoubleProperty biasWeight = new SimpleDoubleProperty();
-    protected final SimpleDoubleProperty output = new SimpleDoubleProperty();
+    protected final Map<Outputable, MyDoubleProperty> entriesWeight = new HashMap<>();
+    protected final MyDoubleProperty biasWeight = new MyDoubleProperty();
+    protected final MyDoubleProperty output = new MyDoubleProperty();
 
-    protected final SimpleDoubleProperty errorProperty = new SimpleDoubleProperty();
+    protected final MyDoubleProperty errorProperty = new MyDoubleProperty();
 
     protected double weightedSum;
 
     public VirtualNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
-            final ActivationFunction activationFunction, final Layer<?> previousLayer,
+            final ActFunction activationFunction, final Layer<?> previousLayer,
             final double learningRate, final double bias) {
         this.activationFunction = activationFunction;
         this.learningRate = learningRate;
         this.bias = bias;
 
         biasWeight.set(Math.random() * (weightRangeStartMax - weightRangeStartMin) + weightRangeStartMin);
-        previousLayer.forEach(out -> entriesWeight.put(out, new SimpleDoubleProperty(
+        previousLayer.forEach(out -> entriesWeight.put(out, new MyDoubleProperty(
                 Math.random() * (weightRangeStartMax - weightRangeStartMin) + weightRangeStartMin)));
     }
 
@@ -40,7 +40,7 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         weightedSum = bias * biasWeight.get() + entriesWeight.entrySet().stream()
                 .mapToDouble(entry -> entry.getKey().getOutput() * entry.getValue().get())
                 .sum();
-        output.set(activationFunction.apply(weightedSum));
+        output.set(activationFunction.getActivationFunction().apply(weightedSum));
     }
 
     public abstract void calculateErrorAndUpdateWeight();
@@ -50,7 +50,7 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
     }
 
     @Override
-    public SimpleDoubleProperty getOutputProperty() {
+    public MyDoubleProperty getOutputProperty() {
         return output;
     }
 
@@ -59,11 +59,11 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         return output.get();
     }
 
-    public ActivationFunction getActivationFunction() {
+    public ActFunction getActivationFunction() {
         return activationFunction;
     }
 
-    public void setActivationFunction(final ActivationFunction activationFunction) {
+    public void setActivationFunction(final ActFunction activationFunction) {
         this.activationFunction = activationFunction;
     }
 
@@ -83,7 +83,7 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         this.bias = bias;
     }
 
-    public SimpleDoubleProperty getEntryWeightProperty(final Outputable entry) {
+    public MyDoubleProperty getEntryWeightProperty(final Outputable entry) {
         return entriesWeight.get(entry);
     }
 
@@ -91,7 +91,7 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         entriesWeight.get(entry).set(weight);
     }
 
-    public SimpleDoubleProperty getBiasWeightProperty() {
+    public MyDoubleProperty getBiasWeightProperty() {
         return biasWeight;
     }
 
@@ -99,7 +99,7 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         biasWeight.set(weight);
     }
 
-    public SimpleDoubleProperty getErrorProperty() {
+    public MyDoubleProperty getErrorProperty() {
         return errorProperty;
     }
 

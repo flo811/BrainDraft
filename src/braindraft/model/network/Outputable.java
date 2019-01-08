@@ -1,6 +1,7 @@
 package braindraft.model.network;
 
-import javafx.beans.property.SimpleDoubleProperty;
+import braindraft.model.MyDoubleProperty;
+
 
 /**
  *
@@ -8,7 +9,7 @@ import javafx.beans.property.SimpleDoubleProperty;
  */
 public interface Outputable {
 
-    SimpleDoubleProperty getOutputProperty();
+    MyDoubleProperty getOutputProperty();
 
     double getOutput();
 }

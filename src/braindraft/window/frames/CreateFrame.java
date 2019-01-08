@@ -3,7 +3,6 @@ package braindraft.window.frames;
 import braindraft.model.network.Network;
 import braindraft.dao.NetworkDAO;
 import braindraft.model.ActFunction;
-import braindraft.model.ActivationFunction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,7 +40,7 @@ public final class CreateFrame extends BorderPane {
 
     private final ComboBox<Integer> nbrHiddenCombo
             = new ComboBox<>(FXCollections.observableArrayList(0, 1, 2, 3, 4, 5, 6));
-    private final ComboBox<ActivationFunction> activationFunctionCombo;
+    private final ComboBox<ActFunction> activationFunctionCombo;
 
     private final VBox inputsBox = new VBox(inputText, inputTextField);
     private final VBox nbrHiddenBox = new VBox(nbrHiddenText, nbrHiddenCombo);
@@ -65,7 +64,6 @@ public final class CreateFrame extends BorderPane {
 
         activationFunctionCombo = new ComboBox<>(FXCollections.observableArrayList(
                 Arrays.stream(ActFunction.values())
-                        .map(ActFunction::getActivationFunction)
                         .collect(Collectors.toList())
         ));
         activationFunctionCombo.getSelectionModel().selectFirst();

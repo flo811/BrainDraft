@@ -21,6 +21,10 @@ public abstract class Layer<T extends Outputable> implements Serializable {
         neurons.forEach(consumer);
     }
 
+    public int size() {
+        return neurons.size();
+    }
+
     public List<T> getAll() {
         return neurons;
     }

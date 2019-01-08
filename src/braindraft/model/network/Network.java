@@ -1,6 +1,5 @@
 package braindraft.model.network;
 
-import braindraft.dao.NetworkProxy;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +9,8 @@ import java.util.List;
  * @author flo
  */
 public class Network implements Serializable {
+
+    private static final long serialVersionUID = 2153325708407476017L;
 
     private final InputLayer inputLayer;
     private final List<HiddenLayer> hiddenLayers;
@@ -43,9 +44,5 @@ public class Network implements Serializable {
 
     public OutputNeuron getOutput(final int i) {
         return outputLayer.get(i);
-    }
-
-    private NetworkProxy writeReplace() {
-        return new NetworkProxy();
     }
 }
