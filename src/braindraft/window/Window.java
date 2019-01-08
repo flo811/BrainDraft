@@ -152,6 +152,7 @@ public class Window {
         try {
             final CreateFrame createFrame = new CreateFrame();
             root.setCenter(createFrame);
+
             networkProperty.bind(createFrame.getNetworkProperty());
             modifiedProperty.set(true);
         } catch (final Exception ex) {
@@ -164,7 +165,9 @@ public class Window {
     }
 
     private void displayNetworkFrame(final Network network) {
-        trainerProperty.set(new Trainer(network));
         root.setCenter(new NetworkFrame(network));
+
+        trainerProperty.set(new Trainer(network));
+        networkProperty.set(network);
     }
 }

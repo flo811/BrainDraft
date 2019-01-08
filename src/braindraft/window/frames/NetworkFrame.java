@@ -11,6 +11,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -20,7 +21,7 @@ import javafx.scene.shape.Rectangle;
  *
  * @author flo
  */
-public final class NetworkFrame extends ScrollPane {
+public final class NetworkFrame extends StackPane {
 
     private static final int SPACING = 20;
     private static final Background BACKGROUND = new Background(new BackgroundFill(
@@ -31,12 +32,14 @@ public final class NetworkFrame extends ScrollPane {
     private final HBox outputBox = new HBox(SPACING);
 
     private final VBox networkBox = new VBox(SPACING, inputBox, hiddenHBoxes, outputBox);
+    private final ScrollPane scrollBox = new ScrollPane(networkBox);
 
     public NetworkFrame(final Network network) {
         super();
-        setContent(networkBox);
-        setFitToWidth(true);
-        setFitToHeight(true);
+        getChildren().add(scrollBox);
+
+        scrollBox.setFitToWidth(true);
+        scrollBox.setFitToHeight(true);
 
         network.getInputLayer().forEach(neuron -> inputBox.getChildren()
                 .add(new GraphicalInput(new Circle(50, Color.ANTIQUEWHITE), neuron)));
@@ -44,7 +47,7 @@ public final class NetworkFrame extends ScrollPane {
         network.getHiddenLayers().forEach(hiddenLayer -> {
             final HBox hiddenBox = new HBox(SPACING);
             hiddenLayer.forEach(neuron -> {
-                final Rectangle hiddenShape = new Rectangle(50, 50, Color.LIGHTSTEELBLUE);
+                final Rectangle hiddenShape = new Rectangle(100, 100, Color.LIGHTSTEELBLUE);
                 hiddenShape.setArcWidth(50);
                 hiddenShape.setArcHeight(50);
                 hiddenBox.getChildren().add(new GraphicalHidden(hiddenShape, neuron));
@@ -53,7 +56,7 @@ public final class NetworkFrame extends ScrollPane {
         });
 
         network.getOutputLayer().forEach(neuron -> {
-            final Rectangle outputShape = new Rectangle(50, 50, Color.LIGHTGREEN);
+            final Rectangle outputShape = new Rectangle(100, 100, Color.LIGHTGREEN);
             outputShape.setArcWidth(20);
             outputShape.setArcHeight(20);
             outputBox.getChildren().add(new GraphicalOutput(outputShape, neuron));

@@ -1,8 +1,8 @@
 package braindraft.window.frames;
 
-import braindraft.model.network.Network;
 import braindraft.dao.NetworkDAO;
 import braindraft.model.ActFunction;
+import braindraft.model.network.Network;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -52,8 +54,9 @@ public final class CreateFrame extends BorderPane {
     private final VBox biasBox = new VBox(biasText, biasTextField);
     private final VBox learningRateBox = new VBox(learningRateText, learningRateTextField);
 
-    private final VBox optionsBox = new VBox(20, inputsBox, nbrHiddenBox, hiddenBox, outputBox, activationFunctionBox,
-            minWeightBox, maxWeightBox, biasBox, learningRateBox);
+    private final VBox optionsContainerBox = new VBox(20, inputsBox, nbrHiddenBox, hiddenBox,
+            outputBox, activationFunctionBox, minWeightBox, maxWeightBox, biasBox, learningRateBox);
+    private final ScrollPane optionsBox = new ScrollPane(optionsContainerBox);
 
     private final Map<Integer, Integer> hiddenNbrs = new HashMap<>();
     private final SimpleObjectProperty<Network> networkProperty = new SimpleObjectProperty<>();
@@ -61,6 +64,10 @@ public final class CreateFrame extends BorderPane {
     public CreateFrame() throws IllegalArgumentException, IllegalAccessException {
         super();
         setLeft(optionsBox);
+
+        optionsBox.setFitToWidth(true);
+        optionsBox.setFitToHeight(true);
+        optionsContainerBox.setPadding(new Insets(20, 50, 10, 20));
 
         activationFunctionCombo = new ComboBox<>(FXCollections.observableArrayList(
                 Arrays.stream(ActFunction.values())
@@ -95,6 +102,12 @@ public final class CreateFrame extends BorderPane {
         maxWeightTextField.textProperty().addListener((observable, oldValue, newValue) -> createNetwork());
         biasTextField.textProperty().addListener((observable, oldValue, newValue) -> createNetwork());
         learningRateTextField.textProperty().addListener((observable, oldValue, newValue) -> createNetwork());
+        
+        inputTextField.setOnKeyTyped(k -> {
+            if (k.getCharacter().matches("[^0-9]")) {
+                k.consume();
+            }
+        });
     }
 
     private void createNetwork() {
