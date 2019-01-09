@@ -9,13 +9,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 /**
@@ -73,11 +81,10 @@ public final class CreateFrame extends BorderPane {
                 Arrays.stream(ActFunction.values())
                         .collect(Collectors.toList())
         ));
-        activationFunctionCombo.getSelectionModel().selectFirst();
         activationFunctionBox.getChildren().add(activationFunctionCombo);
 
-        inputTextField.textProperty().addListener((observable, oldValue, newValue) -> createNetwork());
-        nbrHiddenCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+        inputTextField.textProperty().addListener(createNetworkOnChange(inputTextField, true));
+        nbrHiddenCombo.valueProperty().addListener((ob, oVal, nVal) -> {
             hiddenBox.getChildren().clear();
             hiddenNbrs.clear();
             final int nbr = nbrHiddenCombo.getValue();
@@ -85,38 +92,69 @@ public final class CreateFrame extends BorderPane {
                 final int key = i;
                 final TextField hiddenTextField = new TextField();
                 hiddenTextField.textProperty().addListener((obs, oldVal, newVal) -> {
-                    hiddenNbrs.put(key, Integer.valueOf(hiddenTextField.getText()));
-                    createNetwork();
+                    try {
+                        if (Integer.valueOf(newVal) < 1) {
+                            throw new RuntimeException();
+                        }
+                        hiddenTextField.setBackground(Background.EMPTY);
+                        hiddenNbrs.put(key, Integer.valueOf(hiddenTextField.getText()));
+                        createNetwork();
+                    } catch (final RuntimeException nfe) {
+                        hiddenTextField.setBackground(new Background(new BackgroundFill(Color.ORANGERED, CornerRadii.EMPTY, Insets.EMPTY)));
+                    }
                 });
                 hiddenTextField.setText("1");
                 final VBox hiddenLayer = new VBox(new Text("Hidden layer " + (i + 1) + " size:"), hiddenTextField);
                 hiddenBox.getChildren().add(hiddenLayer);
             }
-            createNetwork();
-        });
-        nbrHiddenCombo.getSelectionModel().selectFirst();
+        }
+        );
+        outputTextField.textProperty().addListener(createNetworkOnChange(outputTextField, true));
+        activationFunctionCombo.valueProperty().addListener((obs, oldVal, newVal) -> createNetwork());
+        minWeightTextField.textProperty().addListener(createNetworkOnChange(minWeightTextField, false));
+        maxWeightTextField.textProperty().addListener(createNetworkOnChange(maxWeightTextField, false));
+        biasTextField.textProperty().addListener(createNetworkOnChange(biasTextField, false));
+        learningRateTextField.textProperty().addListener(createNetworkOnChange(learningRateTextField, false));
 
-        outputTextField.textProperty().addListener((observable, oldValue, newValue) -> createNetwork());
-        activationFunctionCombo.valueProperty().addListener((observable, oldValue, newValue) -> createNetwork());
-        minWeightTextField.textProperty().addListener((observable, oldValue, newValue) -> createNetwork());
-        maxWeightTextField.textProperty().addListener((observable, oldValue, newValue) -> createNetwork());
-        biasTextField.textProperty().addListener((observable, oldValue, newValue) -> createNetwork());
-        learningRateTextField.textProperty().addListener((observable, oldValue, newValue) -> createNetwork());
-        
-        inputTextField.setOnKeyTyped(k -> {
-            if (k.getCharacter().matches("[^0-9]")) {
+        final EventHandler<KeyEvent> onlyNumValuesHandler = k -> {
+            if (k.getCharacter().matches("[^0-9.]")) {
                 k.consume();
             }
-        });
+        };
+        inputTextField.setOnKeyTyped(onlyNumValuesHandler);
+        outputTextField.setOnKeyTyped(onlyNumValuesHandler);
+        minWeightTextField.setOnKeyTyped(onlyNumValuesHandler);
+        maxWeightTextField.setOnKeyTyped(onlyNumValuesHandler);
+
+        activationFunctionCombo.getSelectionModel().selectFirst();
+        nbrHiddenCombo.getSelectionModel().selectFirst();
+    }
+
+    private ChangeListener<String> createNetworkOnChange(final TextField tf, final boolean isInteger) {
+        return (ObservableValue<? extends String> obs, String oldVal, String newVal) -> {
+            try {
+                if (isInteger) {
+                    if (Integer.valueOf(newVal) < 1) {
+                        throw new RuntimeException();
+                    }
+                } else {
+                    Double.valueOf(newVal);
+                }
+                tf.setBackground(Background.EMPTY);
+                createNetwork();
+            } catch (final RuntimeException nfe) {
+                tf.setBackground(new Background(new BackgroundFill(Color.ORANGERED, CornerRadii.EMPTY, Insets.EMPTY)));
+            }
+        };
     }
 
     private void createNetwork() {
         final int input = Integer.valueOf(inputTextField.getText());
         final int output = Integer.valueOf(outputTextField.getText());
-        final int min = Integer.valueOf(minWeightTextField.getText());
-        final int max = Integer.valueOf(maxWeightTextField.getText());
-        final int bias = Integer.valueOf(biasTextField.getText());
-        final int rate = Integer.valueOf(learningRateTextField.getText());
+        final double min = Double.valueOf(minWeightTextField.getText());
+        final double max = Double.valueOf(maxWeightTextField.getText());
+        final double bias = Double.valueOf(biasTextField.getText());
+        final double rate = Double.valueOf(learningRateTextField.getText());
 
         networkProperty.set(NetworkDAO.createSimpleNetwork(min, max,
                 activationFunctionCombo.getValue(), rate, bias, input,
