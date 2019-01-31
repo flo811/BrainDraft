@@ -1,6 +1,6 @@
 package braindraft.model.network;
 
-import braindraft.model.ActFunction;
+import braindraft.model.ActivationFunctions;
 import braindraft.model.MyDoubleProperty;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public abstract class VirtualNeuron implements Outputable, Serializable {
 
-    protected ActFunction activationFunction;
+    protected ActivationFunctions activationFunction;
     protected double learningRate;
     protected double bias;
 
@@ -25,7 +25,7 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
     protected double weightedSum;
 
     public VirtualNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
-            final ActFunction activationFunction, final Layer<?> previousLayer,
+            final ActivationFunctions activationFunction, final Layer<?> previousLayer,
             final double learningRate, final double bias) {
         this.activationFunction = activationFunction;
         this.learningRate = learningRate;
@@ -59,11 +59,11 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         return output.get();
     }
 
-    public ActFunction getActivationFunction() {
+    public ActivationFunctions getActivationFunction() {
         return activationFunction;
     }
 
-    public void setActivationFunction(final ActFunction activationFunction) {
+    public void setActivationFunction(final ActivationFunctions activationFunction) {
         this.activationFunction = activationFunction;
     }
 

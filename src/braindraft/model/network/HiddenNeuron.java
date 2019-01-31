@@ -1,6 +1,6 @@
 package braindraft.model.network;
 
-import braindraft.model.ActFunction;
+import braindraft.model.ActivationFunctions;
 
 /**
  *
@@ -11,7 +11,7 @@ public class HiddenNeuron extends VirtualNeuron {
     private Layer<? extends VirtualNeuron> nextLayer;
 
     public HiddenNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
-            final ActFunction activationFunction, final Layer<?> previousLayer,
+            final ActivationFunctions activationFunction, final Layer<?> previousLayer,
             final double learningRate, final double bias) {
         super(weightRangeStartMin, weightRangeStartMax, activationFunction, previousLayer, learningRate, bias);
     }

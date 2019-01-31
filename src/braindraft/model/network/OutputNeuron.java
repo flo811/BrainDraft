@@ -1,6 +1,6 @@
 package braindraft.model.network;
 
-import braindraft.model.ActFunction;
+import braindraft.model.ActivationFunctions;
 import braindraft.model.MyDoubleProperty;
 
 /**
@@ -12,7 +12,7 @@ public class OutputNeuron extends VirtualNeuron {
     private final MyDoubleProperty expectedProperty = new MyDoubleProperty();
 
     public OutputNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
-            final ActFunction activationFunction, final Layer<?> previousLayer,
+            final ActivationFunctions activationFunction, final Layer<?> previousLayer,
             final double learningRate, final double bias) {
         super(weightRangeStartMin, weightRangeStartMax, activationFunction, previousLayer, learningRate, bias);
     }

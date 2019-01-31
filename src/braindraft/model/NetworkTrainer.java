@@ -1,5 +1,7 @@
 package braindraft.model;
 
+import java.util.DoubleSummaryStatistics;
+
 /**
  *
  * @author flo
@@ -8,7 +10,7 @@ public interface NetworkTrainer {
 
     public void train();
 
-    public void test();
+    public DoubleSummaryStatistics test();
 
     public void pause();
 

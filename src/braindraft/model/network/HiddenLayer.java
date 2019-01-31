@@ -11,4 +11,8 @@ public class HiddenLayer extends Layer<HiddenNeuron> {
     public HiddenLayer(final List<HiddenNeuron> hiddenNeurons) {
         super(hiddenNeurons);
     }
+
+    public void activate() {
+        neurons.forEach(HiddenNeuron::activate);
+    }
 }

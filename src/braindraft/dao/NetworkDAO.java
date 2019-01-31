@@ -1,6 +1,6 @@
 package braindraft.dao;
 
-import braindraft.model.ActFunction;
+import braindraft.model.ActivationFunctions;
 import braindraft.model.network.HiddenLayer;
 import braindraft.model.network.HiddenNeuron;
 import braindraft.model.network.InputLayer;
@@ -29,7 +29,7 @@ public final class NetworkDAO {
     }
 
     public static Network createSimpleNetwork(final double weightRangeStartMin, final double weightRangeStartMax,
-            final ActFunction activationFunction, final double learningRate, final double bias,
+            final ActivationFunctions activationFunction, final double learningRate, final double bias,
             final int inputNbr, final List<Integer> hiddenNbrs, final int outputNbr) {
 
         final List<InputNeuron> inputs = IntStream

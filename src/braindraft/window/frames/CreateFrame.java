@@ -1,7 +1,7 @@
 package braindraft.window.frames;
 
 import braindraft.dao.NetworkDAO;
-import braindraft.model.ActFunction;
+import braindraft.model.ActivationFunctions;
 import braindraft.model.network.Network;
 import braindraft.window.Window;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public final class CreateFrame extends BorderPane {
     private final TextField learningRateTextField = new TextField("1");
 
     private final ComboBox<Integer> nbrHiddenCombo = new ComboBox<>(FXCollections.observableArrayList(0, 1, 2, 3, 4, 5, 6));
-    private final ComboBox<ActFunction> activationFunctionCombo;
+    private final ComboBox<ActivationFunctions> activationFunctionCombo;
 
     private final Button validateButton = new Button("", new ImageView("validate.png"));
 
@@ -95,8 +95,7 @@ public final class CreateFrame extends BorderPane {
         biasTextField.setBorder(getTextFielBorder());
         learningRateTextField.setBorder(getTextFielBorder());
 
-        activationFunctionCombo = new ComboBox<>(FXCollections.observableArrayList(
-                Arrays.stream(ActFunction.values())
+        activationFunctionCombo = new ComboBox<>(FXCollections.observableArrayList(Arrays.stream(ActivationFunctions.values())
                         .collect(Collectors.toList())
         ));
         activationFunctionBox.getChildren().add(activationFunctionCombo);
