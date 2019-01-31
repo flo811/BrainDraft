@@ -150,7 +150,7 @@ public class Window {
 
     private void displayCreateFrame() {
         try {
-            final CreateFrame createFrame = new CreateFrame();
+            final CreateFrame createFrame = new CreateFrame(this);
             root.setCenter(createFrame);
 
             networkProperty.bind(createFrame.getNetworkProperty());
@@ -164,10 +164,11 @@ public class Window {
         root.setCenter(new EmptyFrame(menu.getOpenItemActionProperty(), menu.getNewItemActionProperty()));
     }
 
-    private void displayNetworkFrame(final Network network) {
+    public void displayNetworkFrame(final Network network) {
         root.setCenter(new NetworkFrame(network));
 
-        trainerProperty.set(new Trainer(network));
+        networkProperty.unbind();
         networkProperty.set(network);
+        trainerProperty.set(new Trainer(network));
     }
 }

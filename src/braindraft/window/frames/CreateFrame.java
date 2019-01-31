@@ -3,25 +3,35 @@ package braindraft.window.frames;
 import braindraft.dao.NetworkDAO;
 import braindraft.model.ActFunction;
 import braindraft.model.network.Network;
+import braindraft.window.Window;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -32,7 +42,7 @@ import javafx.scene.text.Text;
  */
 public final class CreateFrame extends BorderPane {
 
-    private final Text inputText = new Text("How many inouts ?");
+    private final Text inputText = new Text("How many inputs ?");
     private final Text nbrHiddenText = new Text("How many hidden layers ?");
     private final Text outputText = new Text("How many outputs ?");
     private final Text activationfunctionText = new Text("Activation function :");
@@ -41,16 +51,17 @@ public final class CreateFrame extends BorderPane {
     private final Text biasText = new Text("Init bias :");
     private final Text learningRateText = new Text("Learning rate :");
 
-    private final TextField inputTextField = new TextField("2");
-    private final TextField outputTextField = new TextField("1");
+    private final TextField inputTextField = new TextField("3");
+    private final TextField outputTextField = new TextField("2");
     private final TextField minWeightTextField = new TextField("-1");
     private final TextField maxWeightTextField = new TextField("1");
     private final TextField biasTextField = new TextField("1");
     private final TextField learningRateTextField = new TextField("1");
 
-    private final ComboBox<Integer> nbrHiddenCombo
-            = new ComboBox<>(FXCollections.observableArrayList(0, 1, 2, 3, 4, 5, 6));
+    private final ComboBox<Integer> nbrHiddenCombo = new ComboBox<>(FXCollections.observableArrayList(0, 1, 2, 3, 4, 5, 6));
     private final ComboBox<ActFunction> activationFunctionCombo;
+
+    private final Button validateButton = new Button("", new ImageView("validate.png"));
 
     private final VBox inputsBox = new VBox(inputText, inputTextField);
     private final VBox nbrHiddenBox = new VBox(nbrHiddenText, nbrHiddenCombo);
@@ -62,20 +73,27 @@ public final class CreateFrame extends BorderPane {
     private final VBox biasBox = new VBox(biasText, biasTextField);
     private final VBox learningRateBox = new VBox(learningRateText, learningRateTextField);
 
-    private final VBox optionsContainerBox = new VBox(20, inputsBox, nbrHiddenBox, hiddenBox,
-            outputBox, activationFunctionBox, minWeightBox, maxWeightBox, biasBox, learningRateBox);
+    private final VBox optionsContainerBox = new VBox(20, inputsBox, nbrHiddenBox, hiddenBox, outputBox,
+            activationFunctionBox, minWeightBox, maxWeightBox, biasBox, learningRateBox, new StackPane(validateButton));
     private final ScrollPane optionsBox = new ScrollPane(optionsContainerBox);
 
     private final Map<Integer, Integer> hiddenNbrs = new HashMap<>();
     private final SimpleObjectProperty<Network> networkProperty = new SimpleObjectProperty<>();
 
-    public CreateFrame() throws IllegalArgumentException, IllegalAccessException {
+    public CreateFrame(final Window window) throws IllegalArgumentException, IllegalAccessException {
         super();
         setLeft(optionsBox);
 
         optionsBox.setFitToWidth(true);
         optionsBox.setFitToHeight(true);
-        optionsContainerBox.setPadding(new Insets(20, 50, 10, 20));
+        optionsContainerBox.setPadding(new Insets(10, 10, 10, 10));
+
+        inputTextField.setBorder(getTextFielBorder());
+        outputTextField.setBorder(getTextFielBorder());
+        minWeightTextField.setBorder(getTextFielBorder());
+        maxWeightTextField.setBorder(getTextFielBorder());
+        biasTextField.setBorder(getTextFielBorder());
+        learningRateTextField.setBorder(getTextFielBorder());
 
         activationFunctionCombo = new ComboBox<>(FXCollections.observableArrayList(
                 Arrays.stream(ActFunction.values())
@@ -83,69 +101,24 @@ public final class CreateFrame extends BorderPane {
         ));
         activationFunctionBox.getChildren().add(activationFunctionCombo);
 
-        inputTextField.textProperty().addListener(createNetworkOnChange(inputTextField, true));
-        nbrHiddenCombo.valueProperty().addListener((ob, oVal, nVal) -> {
-            hiddenBox.getChildren().clear();
-            hiddenNbrs.clear();
-            final int nbr = nbrHiddenCombo.getValue();
-            for (int i = 0; i < nbr; i++) {
-                final int key = i;
-                final TextField hiddenTextField = new TextField();
-                hiddenTextField.textProperty().addListener((obs, oldVal, newVal) -> {
-                    try {
-                        if (Integer.valueOf(newVal) < 1) {
-                            throw new RuntimeException();
-                        }
-                        hiddenTextField.setBackground(Background.EMPTY);
-                        hiddenNbrs.put(key, Integer.valueOf(hiddenTextField.getText()));
-                        createNetwork();
-                    } catch (final RuntimeException nfe) {
-                        hiddenTextField.setBackground(new Background(new BackgroundFill(Color.ORANGERED, CornerRadii.EMPTY, Insets.EMPTY)));
-                    }
-                });
-                hiddenTextField.setText("1");
-                final VBox hiddenLayer = new VBox(new Text("Hidden layer " + (i + 1) + " size:"), hiddenTextField);
-                hiddenBox.getChildren().add(hiddenLayer);
-            }
-        }
-        );
-        outputTextField.textProperty().addListener(createNetworkOnChange(outputTextField, true));
+        inputTextField.textProperty().addListener(getChangeListener(inputTextField, true));
+        nbrHiddenCombo.valueProperty().addListener((ob, oVal, nVal) -> createLayers());
+        outputTextField.textProperty().addListener(getChangeListener(outputTextField, true));
         activationFunctionCombo.valueProperty().addListener((obs, oldVal, newVal) -> createNetwork());
-        minWeightTextField.textProperty().addListener(createNetworkOnChange(minWeightTextField, false));
-        maxWeightTextField.textProperty().addListener(createNetworkOnChange(maxWeightTextField, false));
-        biasTextField.textProperty().addListener(createNetworkOnChange(biasTextField, false));
-        learningRateTextField.textProperty().addListener(createNetworkOnChange(learningRateTextField, false));
+        minWeightTextField.textProperty().addListener(getChangeListener(minWeightTextField, false));
+        maxWeightTextField.textProperty().addListener(getChangeListener(maxWeightTextField, false));
+        biasTextField.textProperty().addListener(getChangeListener(biasTextField, false));
+        learningRateTextField.textProperty().addListener(getChangeListener(learningRateTextField, false));
 
-        final EventHandler<KeyEvent> onlyNumValuesHandler = k -> {
-            if (k.getCharacter().matches("[^0-9.]")) {
-                k.consume();
-            }
-        };
-        inputTextField.setOnKeyTyped(onlyNumValuesHandler);
-        outputTextField.setOnKeyTyped(onlyNumValuesHandler);
-        minWeightTextField.setOnKeyTyped(onlyNumValuesHandler);
-        maxWeightTextField.setOnKeyTyped(onlyNumValuesHandler);
+        inputTextField.setOnKeyTyped(getOnlyNumValuesHandler());
+        outputTextField.setOnKeyTyped(getOnlyNumValuesHandler());
+        minWeightTextField.setOnKeyTyped(getOnlyNumValuesHandler());
+        maxWeightTextField.setOnKeyTyped(getOnlyNumValuesHandler());
 
         activationFunctionCombo.getSelectionModel().selectFirst();
-        nbrHiddenCombo.getSelectionModel().selectFirst();
-    }
+        nbrHiddenCombo.getSelectionModel().select(1);
 
-    private ChangeListener<String> createNetworkOnChange(final TextField tf, final boolean isInteger) {
-        return (ObservableValue<? extends String> obs, String oldVal, String newVal) -> {
-            try {
-                if (isInteger) {
-                    if (Integer.valueOf(newVal) < 1) {
-                        throw new RuntimeException();
-                    }
-                } else {
-                    Double.valueOf(newVal);
-                }
-                tf.setBackground(Background.EMPTY);
-                createNetwork();
-            } catch (final RuntimeException nfe) {
-                tf.setBackground(new Background(new BackgroundFill(Color.ORANGERED, CornerRadii.EMPTY, Insets.EMPTY)));
-            }
-        };
+        validateButton.setOnAction(e -> window.displayNetworkFrame(networkProperty.get()));
     }
 
     private void createNetwork() {
@@ -161,6 +134,107 @@ public final class CreateFrame extends BorderPane {
                 new ArrayList<>(hiddenNbrs.values()), output)
         );
         setCenter(new NetworkFrame(networkProperty.get()));
+    }
+
+    private void createLayers() {
+        hiddenNbrs.clear();
+        hiddenBox.getChildren().clear();
+
+        for (int i = 0; i < nbrHiddenCombo.getValue(); i++) {
+            final TextField hiddenTextField = new TextField();
+            hiddenBox.getChildren().add(
+                    new VBox(
+                            new Text("Hidden layer " + (i + 1) + " size:"), hiddenTextField)
+            );
+
+            final int key = i;
+            hiddenTextField.setBorder(getTextFielBorder());
+            hiddenTextField.setOnKeyTyped(getOnlyNumValuesHandler());
+            hiddenTextField.textProperty().addListener((obs, oldVal, newVal) -> {
+                try {
+                    if (Integer.valueOf(newVal) < 1) {
+                        throw new RuntimeException();
+                    }
+                    hiddenTextField.setBackground(getTextFieldBackground(Color.WHITE));
+                    hiddenNbrs.put(key, Integer.valueOf(hiddenTextField.getText()));
+                    try {
+                        createNetwork();
+                    } catch (final RuntimeException re) {
+                    }
+                } catch (final RuntimeException re) {
+                    hiddenTextField.setBackground(getTextFieldBackground(Color.ORANGERED));
+                } finally {
+                    setButtunVisibility();
+                }
+            });
+
+            hiddenTextField.setText("3");
+            createNetwork();
+        }
+    }
+
+    private EventHandler<KeyEvent> getOnlyNumValuesHandler() {
+        return k -> {
+            if (k.getCharacter().matches("[^0-9.]")) {
+                k.consume();
+            }
+        };
+    }
+
+    private ChangeListener<String> getChangeListener(final TextField tf, final boolean mustBeInteger) {
+        return (ObservableValue<? extends String> obs, String oldVal, String newVal) -> {
+            try {
+                if (mustBeInteger) {
+                    if (Integer.valueOf(newVal) < 1) {
+                        throw new RuntimeException();
+                    }
+                } else {
+                    Double.valueOf(newVal);
+                }
+                tf.setBackground(getTextFieldBackground(Color.WHITE));
+                try {
+                    createNetwork();
+                } catch (final RuntimeException re) {
+                }
+            } catch (final RuntimeException re) {
+                tf.setBackground(getTextFieldBackground(Color.ORANGERED));
+            } finally {
+                setButtunVisibility();
+            };
+        };
+    }
+
+    private void setButtunVisibility() {
+        final Stream<TextField> tfStream = Stream.concat(
+                Stream.of(inputTextField, outputTextField, minWeightTextField, maxWeightTextField, biasTextField, learningRateTextField),
+                Stream.of(hiddenBox.getChildren().stream()
+                        .flatMap(vb -> ((Pane) vb).getChildren().stream())
+                        .filter(el -> el instanceof TextField)
+                        .map(tf -> (TextField) tf)
+                        .toArray(TextField[]::new))
+        );
+
+        final boolean disable = tfStream
+                .map(tf -> tf.getBackground())
+                .filter(b -> b != null)
+                .flatMap(b -> b.getFills().stream())
+                .map(bgf -> bgf.getFill())
+                .anyMatch(color -> color == Color.ORANGERED);
+
+        validateButton.setDisable(disable);
+    }
+
+    private Border getTextFielBorder() {
+        return new Border(
+                new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID,
+                        new CornerRadii(5), BorderWidths.DEFAULT)
+        );
+    }
+
+    private Background getTextFieldBackground(final Color color) {
+        return new Background(
+                new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)
+        );
     }
 
     public SimpleObjectProperty<Network> getNetworkProperty() {

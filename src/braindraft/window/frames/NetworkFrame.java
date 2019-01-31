@@ -47,18 +47,18 @@ public final class NetworkFrame extends StackPane {
         network.getHiddenLayers().forEach(hiddenLayer -> {
             final HBox hiddenBox = new HBox(SPACING);
             hiddenLayer.forEach(neuron -> {
-                final Rectangle hiddenShape = new Rectangle(100, 100, Color.LIGHTSTEELBLUE);
-                hiddenShape.setArcWidth(50);
-                hiddenShape.setArcHeight(50);
+                final Rectangle hiddenShape = new Rectangle(100, 100, Color.LIGHTGREEN);
+                hiddenShape.setArcWidth(30);
+                hiddenShape.setArcHeight(30);
                 hiddenBox.getChildren().add(new GraphicalHidden(hiddenShape, neuron));
             });
             hiddenHBoxes.getChildren().add(hiddenBox);
         });
 
         network.getOutputLayer().forEach(neuron -> {
-            final Rectangle outputShape = new Rectangle(100, 100, Color.LIGHTGREEN);
-            outputShape.setArcWidth(20);
-            outputShape.setArcHeight(20);
+            final Rectangle outputShape = new Rectangle(100, 100, Color.LIGHTSTEELBLUE);
+            outputShape.setArcWidth(80);
+            outputShape.setArcHeight(80);
             outputBox.getChildren().add(new GraphicalOutput(outputShape, neuron));
         });
 

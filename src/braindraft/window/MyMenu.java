@@ -89,8 +89,6 @@ public final class MyMenu extends VBox {
             }
         }
 
-        this.setPadding(new Insets(5, 0, 5, 10));
-
         menuBar.getMenus().addAll(
                 new Menu("File", null, newItem, new SeparatorMenuItem(), openItem, closeItem,
                         new SeparatorMenuItem(), saveItem, new SeparatorMenuItem(), quitItem),
