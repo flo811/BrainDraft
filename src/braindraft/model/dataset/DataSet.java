@@ -47,6 +47,10 @@ public class DataSet {
         return dataSet;
     }
 
+    public Data get(final int i) {
+        return dataSet.get(i);
+    }
+
     public int getInputSize() {
         return inputSize;
     }

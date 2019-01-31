@@ -76,6 +76,7 @@ public class Window {
         });
         menu.setTrainItemAction(e -> {
             trainerProperty.get().train();
+            modifiedProperty.set(true);
             runningProperty.set(true);
         });
         menu.setContinueItemAction(e -> {
@@ -169,6 +170,6 @@ public class Window {
 
         networkProperty.unbind();
         networkProperty.set(network);
-        trainerProperty.set(new Trainer(network));
+        trainerProperty.set(new Trainer(network, runningProperty));
     }
 }
