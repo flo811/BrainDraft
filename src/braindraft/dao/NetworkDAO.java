@@ -1,6 +1,7 @@
 package braindraft.dao;
 
 import braindraft.model.ActivationFunctions;
+import braindraft.model.dataset.Data;
 import braindraft.model.network.HiddenLayer;
 import braindraft.model.network.HiddenNeuron;
 import braindraft.model.network.InputLayer;
@@ -59,7 +60,7 @@ public final class NetworkDAO {
         return new Network(inputLayer, hiddenLayers, new OutputLayer(outputs));
     }
 
-    public static Network open(final File file) throws IOException, ClassNotFoundException {
+    public static Network openNetwork(final File file) throws IOException, ClassNotFoundException {
         if (file == null) {
             return null;
         }
@@ -69,9 +70,19 @@ public final class NetworkDAO {
         }
     }
 
-    public static void save(final Network network, final File file) throws IOException {
+    public static void saveNetwork(final Network network, final File file) throws IOException {
         try (final ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(network);
+        }
+    }
+
+    public static List<Data> openDataSet(final File file) throws IOException, ClassNotFoundException {
+        if (file == null) {
+            return null;
+        }
+
+        try (final ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            return (List<Data>) ois.readObject();
         }
     }
 }

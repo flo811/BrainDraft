@@ -15,4 +15,8 @@ public class HiddenLayer extends Layer<HiddenNeuron> {
     public void activate() {
         neurons.forEach(HiddenNeuron::activate);
     }
+    
+    public void updateWeights(){
+        forEach(HiddenNeuron::calculateErrorAndUpdateWeight);
+    }
 }

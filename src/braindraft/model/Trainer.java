@@ -7,10 +7,9 @@ import braindraft.model.network.Network;
 import java.util.ArrayList;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
+import java.util.stream.Collectors;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Task;
 
 /**
  *
@@ -53,39 +52,72 @@ public class Trainer implements NetworkTrainer {
 
     @Override
     public void train() {
+        final Task<Void> testTask = new Task<Void>() {
+            @Override
+            protected Void call() {
+                if (trainSet == null) {
+                    return null;
+                }
 
+                for (int i = 0; i < trainSet.size(); i++) {
+                    while (inPause) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (final InterruptedException ie) {
+                            cancel();
+                        }
+                    }
+                    if (toStop) {
+                        return null;
+                    }
+
+                    final Data data = testSet.get(i);
+                    activate(data);
+                    network.getOutputLayer().updateWeights();
+                    network.getHiddenLayers().forEach(HiddenLayer::updateWeights);
+                }
+
+                return null;
+            }
+        };
+        testTask.setOnSucceeded(e -> runningProperty.set(false));
+
+        new Thread(testTask).start();
     }
 
     @Override
-    public DoubleSummaryStatistics test() {
-        final Callable<DoubleSummaryStatistics> testCall = () -> {
-            final List<Double> errors = new ArrayList<>();
-
-            for (int i = 0; i < testSet.size(); i++) {
-                final Data data = testSet.get(i);
-                errors.add(quadraticError(activate(data), data.getOutput()));
-
-                while (inPause) {
-                    Thread.sleep(100);
-                }
-                if (toStop) {
+    public void test() {
+        final Task<DoubleSummaryStatistics> testTask = new Task<DoubleSummaryStatistics>() {
+            @Override
+            protected DoubleSummaryStatistics call() {
+                if (testSet == null) {
                     return null;
                 }
+                
+                final List<Double> errors = new ArrayList<>();
+
+                for (int i = 0; i < testSet.size(); i++) {
+                    while (inPause) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (final InterruptedException ie) {
+                            cancel();
+                        }
+                    }
+                    if (toStop) {
+                        return null;
+                    }
+
+                    final Data data = testSet.get(i);
+                    errors.add(quadraticError(activate(data), data.getOutput()));
+                }
+
+                return errors.stream().collect(Collectors.summarizingDouble(x -> x));
             }
-
-            runningProperty.set(false);
-            return errors.stream()
-                    .mapToDouble(val -> val)
-                    .summaryStatistics();
         };
+        testTask.setOnSucceeded(e -> runningProperty.set(false));
 
-        FutureTask<DoubleSummaryStatistics> futureTask = new FutureTask<>(testCall);
-        new Thread(futureTask).start();
-        try {
-            return futureTask.get();
-        } catch (final InterruptedException | ExecutionException ex) {
-            return null;
-        }
+        new Thread(testTask).start();
     }
 
     @Override

@@ -23,12 +23,12 @@ public final class EmptyFrame extends VBox {
     private static final Background BACKGROUND = new Background(new BackgroundFill(
             Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY));
 
-    private final Button openBtn = new Button("Open a network");
-    private final Button createBtn = new Button("Create a network");
+    private final Button openBtn = new Button("Open Network");
+    private final Button createBtn = new Button("Create Network");
 
     public EmptyFrame(final ObjectProperty<EventHandler<ActionEvent>> openItemActionProperty,
             final ObjectProperty<EventHandler<ActionEvent>> newItemActionProperty) {
-        super(50);
+        super(20);
 
         getChildren().addAll(openBtn, createBtn);
         setBackground(BACKGROUND);
@@ -38,12 +38,12 @@ public final class EmptyFrame extends VBox {
         rectangle.setArcHeight(10);
         openBtn.setShape(rectangle);
         createBtn.setShape(rectangle);
-        openBtn.setPrefSize(200, 60);
-        createBtn.setPrefSize(200, 60);
-        openBtn.setFont(Font.font("Comic Sans MS", 20));
-        createBtn.setFont(Font.font("Comic Sans MS", 20));
-        openBtn.setTextFill(Color.GRAY);
-        createBtn.setTextFill(Color.GRAY);
+        openBtn.setPrefSize(150, 40);
+        createBtn.setPrefSize(150, 40);
+        openBtn.setFont(Font.font("Comic Sans MS", 16));
+        createBtn.setFont(Font.font("Comic Sans MS", 16));
+        openBtn.setTextFill(Color.DIMGRAY);
+        createBtn.setTextFill(Color.DIMGRAY);
 
         openBtn.onActionProperty().bind(openItemActionProperty);
         createBtn.onActionProperty().bind(newItemActionProperty);

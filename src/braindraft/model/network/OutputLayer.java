@@ -24,4 +24,8 @@ public class OutputLayer extends Layer<OutputNeuron> {
         
         return outputs;
     }
+    
+    public void updateWeights(){
+        forEach(OutputNeuron::calculateErrorAndUpdateWeight);
+    }
 }

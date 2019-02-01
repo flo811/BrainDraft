@@ -2,11 +2,13 @@ package braindraft.window;
 
 import braindraft.dao.NetworkDAO;
 import braindraft.model.Trainer;
+import braindraft.model.dataset.Data;
 import braindraft.model.network.Network;
 import braindraft.window.frames.CreateFrame;
 import braindraft.window.frames.EmptyFrame;
 import braindraft.window.frames.NetworkFrame;
 import java.io.File;
+import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -44,8 +46,6 @@ public class Window {
 
         fileChooser.setTitle("Choose a location");
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Brain files", "*.brain"));
-        fileChooser.setInitialFileName("network.brain");
 
         displayEmptyFrame();
 
@@ -74,6 +74,13 @@ public class Window {
                 Platform.exit();
             }
         });
+        menu.setTrainDataItemAction(e -> {
+            try {
+                trainerProperty.get().trainWith(openDatas());
+            } catch (final Exception ex) {
+                setAlertMessage(ex);
+            }
+        });
         menu.setTrainItemAction(e -> {
             trainerProperty.get().train();
             modifiedProperty.set(true);
@@ -91,6 +98,14 @@ public class Window {
             trainerProperty.get().stop();
             runningProperty.set(false);
         });
+        menu.setTestDataItemAction(e -> {
+            try {
+                trainerProperty.get().testWith(openDatas());
+            } catch (final Exception ex) {
+                setAlertMessage(ex);
+            }
+        });
+
         menu.setTestItemAction(e -> {
             trainerProperty.get().test();
             runningProperty.set(true);
@@ -118,35 +133,54 @@ public class Window {
         return true;
     }
 
-    private void openNetwork() {
+    private List<Data> openDatas() {
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Brain data files", "*.bdata"));
+        fileChooser.setInitialFileName("bdatas.bdata");
+
         try {
-            final Network network = NetworkDAO.open(fileChooser.showOpenDialog(root.getScene().getWindow()));
+            return NetworkDAO.openDataSet(fileChooser.showOpenDialog(root.getScene().getWindow()));
+        } catch (final Exception ex) {
+            setAlertMessage(ex);
+            return null;
+        }
+    }
+
+    private void openNetwork() {
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Brain files", "*.brain"));
+        fileChooser.setInitialFileName("network.brain");
+
+        try {
+            final Network network = NetworkDAO.openNetwork(fileChooser.showOpenDialog(root.getScene().getWindow()));
             if (network != null) {
                 displayNetworkFrame(network);
             }
         } catch (final Exception ex) {
-            final Alert alert = new Alert(AlertType.ERROR);
-            alert.setContentText("An error occured :\n" + ex.getMessage());
-            alert.showAndWait();
+            setAlertMessage(ex);
         }
     }
 
     private boolean saveNetwork() {
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Brain files", "*.brain"));
+        fileChooser.setInitialFileName("network.brain");
+
         try {
             final File file = fileChooser.showSaveDialog(root.getScene().getWindow());
             if (file != null) {
-                NetworkDAO.save(networkProperty.get(), file);
+                NetworkDAO.saveNetwork(networkProperty.get(), file);
                 modifiedProperty.set(false);
                 return true;
             }
         } catch (final Exception ex) {
-            final Alert alert = new Alert(AlertType.ERROR);
-            alert.setContentText("An error occured :\n" + ex.toString());
-            ex.printStackTrace();
-            alert.showAndWait();
+            setAlertMessage(ex);
         }
 
         return false;
+    }
+
+    private void setAlertMessage(final Exception ex) {
+        final Alert alert = new Alert(AlertType.ERROR);
+        alert.setContentText("An error occured :\n" + ex.getMessage());
+        alert.showAndWait();
     }
 
     private void displayCreateFrame() {
