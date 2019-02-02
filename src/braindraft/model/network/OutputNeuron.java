@@ -12,9 +12,9 @@ public class OutputNeuron extends VirtualNeuron {
     private final MyDoubleProperty expectedProperty = new MyDoubleProperty();
 
     public OutputNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
-            final ActivationFunctions activationFunction, final Layer<?> previousLayer,
-            final double learningRate, final double bias) {
-        super(weightRangeStartMin, weightRangeStartMax, activationFunction, previousLayer, learningRate, bias);
+            final ActivationFunctions activationFunction, final double learningRate,
+            final double bias, final Layer<? extends Outputable>... previousLayer) {
+        super(weightRangeStartMin, weightRangeStartMax, activationFunction, learningRate, bias, previousLayer);
     }
 
     @Override

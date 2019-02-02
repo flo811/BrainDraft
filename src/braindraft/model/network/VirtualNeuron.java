@@ -3,6 +3,7 @@ package braindraft.model.network;
 import braindraft.model.ActivationFunctions;
 import braindraft.model.MyDoubleProperty;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,14 +26,16 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
     protected double weightedSum;
 
     public VirtualNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
-            final ActivationFunctions activationFunction, final Layer<?> previousLayer,
-            final double learningRate, final double bias) {
+            final ActivationFunctions activationFunction, final double learningRate,
+            final double bias, final Layer<? extends Outputable>... previousLayers) {
         this.activationFunction = activationFunction;
         this.learningRate = learningRate;
         this.bias = bias;
 
         biasWeight.set(Math.random() * (weightRangeStartMax - weightRangeStartMin) + weightRangeStartMin);
-        previousLayer.forEach(out -> entriesWeight.put(out, new MyDoubleProperty(
+        Arrays.stream(previousLayers)
+                .flatMap(l -> l.stream())
+                .forEach(out -> entriesWeight.put(out, new MyDoubleProperty(
                 Math.random() * (weightRangeStartMax - weightRangeStartMin) + weightRangeStartMin)));
     }
 

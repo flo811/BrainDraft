@@ -96,7 +96,7 @@ public final class CreateFrame extends BorderPane {
         learningRateTextField.setBorder(getTextFielBorder());
 
         activationFunctionCombo = new ComboBox<>(FXCollections.observableArrayList(Arrays.stream(ActivationFunctions.values())
-                        .collect(Collectors.toList())
+                .collect(Collectors.toList())
         ));
         activationFunctionBox.getChildren().add(activationFunctionCombo);
 
@@ -168,8 +168,9 @@ public final class CreateFrame extends BorderPane {
             });
 
             hiddenTextField.setText("3");
-            createNetwork();
         }
+        
+        createNetwork();
     }
 
     private EventHandler<KeyEvent> getOnlyNumValuesHandler() {

@@ -44,8 +44,8 @@ public final class NetworkDAO {
             final List<HiddenNeuron> hidden = IntStream
                     .range(0, nbr)
                     .mapToObj(i -> new HiddenNeuron(weightRangeStartMin, weightRangeStartMax,
-                    activationFunction, hiddenLayers.isEmpty() ? inputLayer : hiddenLayers.getLast(),
-                    learningRate, bias))
+                    activationFunction, learningRate, bias,
+                    hiddenLayers.isEmpty() ? inputLayer : hiddenLayers.getLast()))
                     .collect(Collectors.toList());
             hiddenLayers.add(new HiddenLayer(hidden));
         }
@@ -53,8 +53,8 @@ public final class NetworkDAO {
         final List<OutputNeuron> outputs = IntStream
                 .range(0, outputNbr)
                 .mapToObj(i -> new OutputNeuron(weightRangeStartMin, weightRangeStartMax,
-                activationFunction, hiddenLayers.isEmpty() ? inputLayer : hiddenLayers.getLast(),
-                learningRate, bias))
+                activationFunction, learningRate, bias,
+                hiddenLayers.isEmpty() ? inputLayer : hiddenLayers.getLast()))
                 .collect(Collectors.toList());
 
         return new Network(inputLayer, hiddenLayers, new OutputLayer(outputs));

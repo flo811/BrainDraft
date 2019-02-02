@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  *
@@ -15,6 +16,10 @@ public abstract class Layer<T extends Outputable> implements Serializable {
 
     public Layer(final List<T> neurons) {
         this.neurons.addAll(neurons);
+    }
+
+    public Stream<T> stream() {
+        return neurons.stream();
     }
 
     public void forEach(final Consumer<T> consumer) {
