@@ -1,7 +1,6 @@
 package braindraft.model.network;
 
 import braindraft.model.ActivationFunctions;
-import braindraft.model.MyDoubleProperty;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,11 +16,11 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
     protected double learningRate;
     protected double bias;
 
-    protected final Map<Outputable, MyDoubleProperty> entriesWeight = new HashMap<>();
-    protected final MyDoubleProperty biasWeight = new MyDoubleProperty();
-    protected final MyDoubleProperty output = new MyDoubleProperty();
-
-    protected final MyDoubleProperty errorProperty = new MyDoubleProperty();
+    protected final Map<Outputable, Double> entriesWeight = new HashMap<>();
+    protected double biasWeight;
+    
+    protected double output;
+    protected double error;
 
     protected double weightedSum;
 
@@ -32,34 +31,32 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         this.learningRate = learningRate;
         this.bias = bias;
 
-        biasWeight.set(Math.random() * (weightRangeStartMax - weightRangeStartMin) + weightRangeStartMin);
+        biasWeight = Math.random() * (weightRangeStartMax - weightRangeStartMin) + weightRangeStartMin;
         Arrays.stream(previousLayers)
                 .flatMap(l -> l.stream())
-                .forEach(out -> entriesWeight.put(out, new MyDoubleProperty(
-                Math.random() * (weightRangeStartMax - weightRangeStartMin) + weightRangeStartMin)));
+                .forEach(out -> entriesWeight.put(out, Math.random() * (weightRangeStartMax - weightRangeStartMin) + weightRangeStartMin));
     }
 
     public void activate() {
-        weightedSum = bias * biasWeight.get() + entriesWeight.entrySet().stream()
-                .mapToDouble(entry -> entry.getKey().getOutput() * entry.getValue().get())
+        weightedSum = bias * biasWeight + entriesWeight.entrySet().stream()
+                .mapToDouble(entry -> entry.getKey().getOutput() * entry.getValue())
                 .sum();
-        output.set(activationFunction.getActivationFunction().apply(weightedSum));
+        output = activationFunction.getActivationFunction().apply(weightedSum);
     }
 
     public abstract void calculateErrorAndUpdateWeight();
 
     public double getWeightWith(final VirtualNeuron neuron) {
-        return entriesWeight.get(neuron).get();
-    }
-
-    @Override
-    public MyDoubleProperty getOutputProperty() {
-        return output;
+        return entriesWeight.get(neuron);
     }
 
     @Override
     public double getOutput() {
-        return output.get();
+        return output;
+    }
+
+    public double getError() {
+        return error;
     }
 
     public ActivationFunctions getActivationFunction() {
@@ -86,27 +83,15 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         this.bias = bias;
     }
 
-    public MyDoubleProperty getEntryWeightProperty(final Outputable entry) {
+    public double getEntryWeight(final Outputable entry) {
         return entriesWeight.get(entry);
     }
 
-    public void setEntryWeight(final Outputable entry, final double weight) {
-        entriesWeight.get(entry).set(weight);
-    }
-
-    public MyDoubleProperty getBiasWeightProperty() {
+    public double getBiasWeight() {
         return biasWeight;
     }
 
     public void setBiasWeight(final double weight) {
-        biasWeight.set(weight);
-    }
-
-    public MyDoubleProperty getErrorProperty() {
-        return errorProperty;
-    }
-
-    public double getError() {
-        return errorProperty.get();
+        biasWeight = weight;
     }
 }

@@ -1,9 +1,7 @@
 package braindraft.window.frames;
 
 import braindraft.model.network.Network;
-import braindraft.window.shapes.GraphicalHidden;
-import braindraft.window.shapes.GraphicalInput;
-import braindraft.window.shapes.GraphicalOutput;
+import braindraft.window.graphicalnetwork.GraphicalNetwork;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
@@ -14,8 +12,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 
 /**
  *
@@ -34,38 +30,37 @@ public final class NetworkFrame extends StackPane {
     private final VBox networkBox = new VBox(SPACING, inputBox, hiddenHBoxes, outputBox);
     private final ScrollPane scrollBox = new ScrollPane(networkBox);
 
+    private final GraphicalNetwork graphicalNetwork;
+
     public NetworkFrame(final Network network) {
         super();
         getChildren().add(scrollBox);
 
-        scrollBox.setFitToWidth(true);
-        scrollBox.setFitToHeight(true);
+        graphicalNetwork = new GraphicalNetwork(network);
 
-        network.getInputLayer().forEach(neuron -> inputBox.getChildren()
-                .add(new GraphicalInput(new Circle(50, Color.ANTIQUEWHITE), neuron)));
-
-        network.getHiddenLayers().forEach(hiddenLayer -> {
+        inputBox.getChildren().addAll(graphicalNetwork.getInputs());
+        graphicalNetwork.getHiddensList().forEach(hiddens -> {
             final HBox hiddenBox = new HBox(SPACING);
-            hiddenLayer.forEach(neuron -> {
-                final Rectangle hiddenShape = new Rectangle(100, 100, Color.LIGHTGREEN);
-                hiddenShape.setArcWidth(30);
-                hiddenShape.setArcHeight(30);
-                hiddenBox.getChildren().add(new GraphicalHidden(hiddenShape, neuron));
-            });
+            hiddenBox.getChildren().addAll(hiddens);
             hiddenHBoxes.getChildren().add(hiddenBox);
         });
+        outputBox.getChildren().addAll(graphicalNetwork.getOutputs());
 
-        network.getOutputLayer().forEach(neuron -> {
-            final Rectangle outputShape = new Rectangle(100, 100, Color.LIGHTSTEELBLUE);
-            outputShape.setArcWidth(80);
-            outputShape.setArcHeight(80);
-            outputBox.getChildren().add(new GraphicalOutput(outputShape, neuron));
-        });
+        scrollBox.setFitToWidth(true);
+        scrollBox.setFitToHeight(true);
 
         networkBox.setBackground(BACKGROUND);
         networkBox.setAlignment(Pos.CENTER);
         inputBox.setAlignment(Pos.CENTER);
         hiddenHBoxes.getChildren().forEach(box -> ((HBox) box).setAlignment(Pos.CENTER));
         outputBox.setAlignment(Pos.CENTER);
+    }
+
+    public void actualize() {
+        graphicalNetwork.actualize();
+    }
+
+    public GraphicalNetwork getGraphicalNetwork() {
+        return graphicalNetwork;
     }
 }

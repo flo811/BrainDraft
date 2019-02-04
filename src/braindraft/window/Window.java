@@ -179,6 +179,7 @@ public class Window {
 
     private void setAlertMessage(final Exception ex) {
         final Alert alert = new Alert(AlertType.ERROR);
+        ex.printStackTrace();
         alert.setContentText("An error occured :\n" + ex.getMessage());
         alert.showAndWait();
     }
@@ -200,10 +201,11 @@ public class Window {
     }
 
     public void displayNetworkFrame(final Network network) {
-        root.setCenter(new NetworkFrame(network));
+        final NetworkFrame networkFrame = new NetworkFrame(network);
+        root.setCenter(networkFrame);
 
         networkProperty.unbind();
         networkProperty.set(network);
-        trainerProperty.set(new Trainer(network, runningProperty));
+        trainerProperty.set(new Trainer(network, networkFrame.getGraphicalNetwork(), runningProperty));
     }
 }

@@ -50,14 +50,28 @@ public final class NetworkDAO {
             hiddenLayers.add(new HiddenLayer(hidden));
         }
 
-        final List<OutputNeuron> outputs = IntStream
-                .range(0, outputNbr)
-                .mapToObj(i -> new OutputNeuron(weightRangeStartMin, weightRangeStartMax,
-                activationFunction, learningRate, bias,
-                hiddenLayers.isEmpty() ? inputLayer : hiddenLayers.getLast()))
-                .collect(Collectors.toList());
+        final OutputLayer outputLayer = new OutputLayer(
+                IntStream.range(0, outputNbr)
+                        .mapToObj(i -> new OutputNeuron(weightRangeStartMin, weightRangeStartMax, activationFunction,
+                        learningRate, bias, hiddenLayers.isEmpty() ? inputLayer : hiddenLayers.getLast()))
+                        .collect(Collectors.toList())
+        );
 
-        return new Network(inputLayer, hiddenLayers, new OutputLayer(outputs));
+        for (int i = 0; i < hiddenLayers.size() - 1; i++) {
+            final HiddenLayer layer = hiddenLayers.get(i);
+            for (int j = 0; j < layer.size(); j++) {
+                layer.get(j).setNextLayer(hiddenLayers.get(i + 1));
+            }
+        }
+
+        if (hiddenLayers.size() > 0) {
+            final HiddenLayer lastHidden = hiddenLayers.get(hiddenLayers.size() - 1);
+            for (int i = 0; i < lastHidden.size(); i++) {
+                lastHidden.get(i).setNextLayer(outputLayer);
+            }
+        }
+
+        return new Network(inputLayer, hiddenLayers, outputLayer);
     }
 
     public static Network openNetwork(final File file) throws IOException, ClassNotFoundException {

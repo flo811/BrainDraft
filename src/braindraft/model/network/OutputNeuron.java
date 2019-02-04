@@ -1,7 +1,6 @@
 package braindraft.model.network;
 
 import braindraft.model.ActivationFunctions;
-import braindraft.model.MyDoubleProperty;
 
 /**
  *
@@ -9,7 +8,7 @@ import braindraft.model.MyDoubleProperty;
  */
 public class OutputNeuron extends VirtualNeuron {
 
-    private final MyDoubleProperty expectedProperty = new MyDoubleProperty();
+    private double expected;
 
     public OutputNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
             final ActivationFunctions activationFunction, final double learningRate,
@@ -19,13 +18,15 @@ public class OutputNeuron extends VirtualNeuron {
 
     @Override
     public void calculateErrorAndUpdateWeight() {
-        errorProperty.set((expectedProperty.get() - output.get())
-                * activationFunction.getActivationFunction().applyDerivate(weightedSum));
-        entriesWeight.forEach((neuron, weightProperty)
-                -> weightProperty.add(learningRate * errorProperty.get() * neuron.getOutput()));
+        error = (expected - output) * activationFunction.getActivationFunction().applyDerivate(weightedSum);
+        entriesWeight.entrySet().forEach(entry -> entry.setValue(learningRate * error * entry.getKey().getOutput()));
     }
 
-    public MyDoubleProperty getExpectedProperty() {
-        return expectedProperty;
+    public double getExpected() {
+        return expected;
+    }
+
+    public void setExpected(final double expected) {
+        this.expected = expected;
     }
 }

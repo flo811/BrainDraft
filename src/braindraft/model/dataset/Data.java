@@ -1,10 +1,14 @@
 package braindraft.model.dataset;
 
+import java.io.Serializable;
+
 /**
  *
  * @author flo
  */
-public class Data {
+public class Data implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final double input[];
     private final double output[];

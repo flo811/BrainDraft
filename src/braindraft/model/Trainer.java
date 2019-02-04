@@ -4,10 +4,13 @@ import braindraft.model.dataset.Data;
 import braindraft.model.dataset.DataSet;
 import braindraft.model.network.HiddenLayer;
 import braindraft.model.network.Network;
+import braindraft.model.network.OutputNeuron;
+import braindraft.window.graphicalnetwork.GraphicalNetwork;
 import java.util.ArrayList;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
 
@@ -18,17 +21,19 @@ import javafx.concurrent.Task;
 public class Trainer implements NetworkTrainer {
 
     private final Network network;
+    private final GraphicalNetwork graphicalNetwork;
+
+    private final SimpleBooleanProperty runningProperty;
 
     private DataSet trainSet;
     private DataSet testSet;
 
-    private final SimpleBooleanProperty runningProperty;
-
     private volatile boolean inPause = false;
     private volatile boolean toStop = false;
 
-    public Trainer(final Network network, final SimpleBooleanProperty runningProperty) {
+    public Trainer(final Network network, final GraphicalNetwork graphicalNetwork, final SimpleBooleanProperty runningProperty) {
         this.network = network;
+        this.graphicalNetwork = graphicalNetwork;
         this.runningProperty = runningProperty;
     }
 
@@ -71,10 +76,24 @@ public class Trainer implements NetworkTrainer {
                         return null;
                     }
 
-                    final Data data = testSet.get(i);
+                    final Data data = trainSet.get(i);
                     activate(data);
+
+                    final List<OutputNeuron> outputNeurons = network.getOutputLayer().getAll();
+                    for (int j = 0; j < outputNeurons.size(); j++) {
+                        outputNeurons.get(j).setExpected(data.getOutput()[j]);
+                    }
+
                     network.getOutputLayer().updateWeights();
                     network.getHiddenLayers().forEach(HiddenLayer::updateWeights);
+
+                    Platform.runLater(graphicalNetwork::actualize);
+                    
+                    try {
+                        Thread.sleep(1000);
+                    } catch (final InterruptedException ie) {
+                        cancel();
+                    }
                 }
 
                 return null;
@@ -93,7 +112,7 @@ public class Trainer implements NetworkTrainer {
                 if (testSet == null) {
                     return null;
                 }
-                
+
                 final List<Double> errors = new ArrayList<>();
 
                 for (int i = 0; i < testSet.size(); i++) {

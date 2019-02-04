@@ -88,12 +88,12 @@ public final class CreateFrame extends BorderPane {
         optionsBox.setFitToHeight(true);
         optionsContainerBox.setPadding(new Insets(10, 10, 10, 10));
 
-        inputTextField.setBorder(getTextFielBorder());
-        outputTextField.setBorder(getTextFielBorder());
-        minWeightTextField.setBorder(getTextFielBorder());
-        maxWeightTextField.setBorder(getTextFielBorder());
-        biasTextField.setBorder(getTextFielBorder());
-        learningRateTextField.setBorder(getTextFielBorder());
+        inputTextField.setBorder(getTextFileBorder());
+        outputTextField.setBorder(getTextFileBorder());
+        minWeightTextField.setBorder(getTextFileBorder());
+        maxWeightTextField.setBorder(getTextFileBorder());
+        biasTextField.setBorder(getTextFileBorder());
+        learningRateTextField.setBorder(getTextFileBorder());
 
         activationFunctionCombo = new ComboBox<>(FXCollections.observableArrayList(Arrays.stream(ActivationFunctions.values())
                 .collect(Collectors.toList())
@@ -147,7 +147,7 @@ public final class CreateFrame extends BorderPane {
             );
 
             final int key = i;
-            hiddenTextField.setBorder(getTextFielBorder());
+            hiddenTextField.setBorder(getTextFileBorder());
             hiddenTextField.setOnKeyTyped(getOnlyNumValuesHandler());
             hiddenTextField.textProperty().addListener((obs, oldVal, newVal) -> {
                 try {
@@ -163,7 +163,7 @@ public final class CreateFrame extends BorderPane {
                 } catch (final RuntimeException re) {
                     hiddenTextField.setBackground(getTextFieldBackground(Color.ORANGERED));
                 } finally {
-                    setButtunVisibility();
+                    setButtonVisibility();
                 }
             });
 
@@ -199,12 +199,12 @@ public final class CreateFrame extends BorderPane {
             } catch (final RuntimeException re) {
                 tf.setBackground(getTextFieldBackground(Color.ORANGERED));
             } finally {
-                setButtunVisibility();
+                setButtonVisibility();
             };
         };
     }
 
-    private void setButtunVisibility() {
+    private void setButtonVisibility() {
         final Stream<TextField> tfStream = Stream.concat(
                 Stream.of(inputTextField, outputTextField, minWeightTextField, maxWeightTextField, biasTextField, learningRateTextField),
                 Stream.of(hiddenBox.getChildren().stream()
@@ -224,7 +224,7 @@ public final class CreateFrame extends BorderPane {
         validateButton.setDisable(disable);
     }
 
-    private Border getTextFielBorder() {
+    private Border getTextFileBorder() {
         return new Border(
                 new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID,
                         new CornerRadii(5), BorderWidths.DEFAULT)

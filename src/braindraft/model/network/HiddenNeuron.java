@@ -21,9 +21,9 @@ public class HiddenNeuron extends VirtualNeuron {
         final double ponderatedErrors = nextLayer.getAll().stream()
                 .mapToDouble(neuron -> neuron.getWeightWith(this) * neuron.getError())
                 .sum();
-        errorProperty.set(ponderatedErrors * activationFunction.getActivationFunction().applyDerivate(weightedSum));
-        biasWeight.add(learningRate * errorProperty.get());
-        entriesWeight.forEach((neuron, weightProperty) -> weightProperty.add(learningRate * errorProperty.get() * neuron.getOutput()));
+        error = ponderatedErrors * activationFunction.getActivationFunction().applyDerivate(weightedSum);
+        biasWeight = learningRate * error;
+        entriesWeight.entrySet().forEach(entry -> entry.setValue(learningRate * error * entry.getKey().getOutput()));
     }
 
     public void setNextLayer(final Layer<? extends VirtualNeuron> nextLayer) {
