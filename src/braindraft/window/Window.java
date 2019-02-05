@@ -19,7 +19,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 /**
  *
@@ -133,7 +132,6 @@ public class Window {
         if (modifiedProperty.get()) {
             final Alert alert = new Alert(AlertType.CONFIRMATION, "Save the current network ?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
             alert.setHeaderText("The current network has not been saved");
-            alert.initStyle(StageStyle.UNDECORATED);
             final ButtonType answer = alert.showAndWait().get();
             if (answer == ButtonType.CANCEL) {
                 return false;
