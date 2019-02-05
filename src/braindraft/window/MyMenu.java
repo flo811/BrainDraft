@@ -111,7 +111,7 @@ public final class MyMenu extends VBox {
         trainDataItem.disableProperty().bind(trainerProperty.isNull().or(runningProperty));
         trainItem.disableProperty().bind(trainerProperty.isNull().or(runningProperty));
         continueItem.disableProperty().bind(pausedProperty.not());
-        pauseItem.disableProperty().bind(runningProperty.not().and(pausedProperty.not()));
+        pauseItem.disableProperty().bind(runningProperty.not().or(pausedProperty));
         stopItem.disableProperty().bind(runningProperty.not().and(pausedProperty.not()));
         testDataItem.disableProperty().bind(trainerProperty.isNull().or(runningProperty));
         testItem.disableProperty().bind(trainerProperty.isNull().or(runningProperty));

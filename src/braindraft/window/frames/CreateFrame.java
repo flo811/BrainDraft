@@ -51,12 +51,12 @@ public final class CreateFrame extends BorderPane {
     private final Text biasText = new Text("Init bias :");
     private final Text learningRateText = new Text("Learning rate :");
 
-    private final TextField inputTextField = new TextField("3");
-    private final TextField outputTextField = new TextField("2");
+    private final TextField inputTextField = new TextField("4");
+    private final TextField outputTextField = new TextField("1");
     private final TextField minWeightTextField = new TextField("-1");
     private final TextField maxWeightTextField = new TextField("1");
     private final TextField biasTextField = new TextField("1");
-    private final TextField learningRateTextField = new TextField("1");
+    private final TextField learningRateTextField = new TextField("0.1");
 
     private final ComboBox<Integer> nbrHiddenCombo = new ComboBox<>(FXCollections.observableArrayList(0, 1, 2, 3, 4, 5, 6));
     private final ComboBox<ActivationFunctions> activationFunctionCombo;
@@ -87,6 +87,7 @@ public final class CreateFrame extends BorderPane {
         optionsBox.setFitToWidth(true);
         optionsBox.setFitToHeight(true);
         optionsContainerBox.setPadding(new Insets(10, 10, 10, 10));
+        validateButton.setDefaultButton(true);
 
         inputTextField.setBorder(getTextFileBorder());
         outputTextField.setBorder(getTextFileBorder());
@@ -167,7 +168,7 @@ public final class CreateFrame extends BorderPane {
                 }
             });
 
-            hiddenTextField.setText("3");
+            hiddenTextField.setText("4");
         }
         
         createNetwork();

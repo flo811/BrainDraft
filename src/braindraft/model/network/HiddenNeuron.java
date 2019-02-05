@@ -18,12 +18,12 @@ public class HiddenNeuron extends VirtualNeuron {
 
     @Override
     public void calculateErrorAndUpdateWeight() {
-        final double ponderatedErrors = nextLayer.getAll().stream()
+        final double ponderatedErrors = nextLayer.stream()
                 .mapToDouble(neuron -> neuron.getWeightWith(this) * neuron.getError())
                 .sum();
         error = ponderatedErrors * activationFunction.getActivationFunction().applyDerivate(weightedSum);
-        biasWeight = learningRate * error;
-        entriesWeight.entrySet().forEach(entry -> entry.setValue(learningRate * error * entry.getKey().getOutput()));
+        biasWeight += learningRate * error * bias;
+        entriesWeight.entrySet().forEach(entry -> entry.setValue(entry.getValue() + learningRate * error * entry.getKey().getOutput()));
     }
 
     public void setNextLayer(final Layer<? extends VirtualNeuron> nextLayer) {

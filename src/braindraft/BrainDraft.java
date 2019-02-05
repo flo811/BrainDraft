@@ -11,14 +11,21 @@ import javafx.stage.Stage;
  */
 public final class BrainDraft extends Application {
 
+    private static Window window;
+
     @Override
     public void start(final Stage stage) {
         stage.setTitle("BrainDraft");
         stage.getIcons().add(new Image("brain.png"));
         stage.setMaximized(true);
 
-        new Window(stage);
+        window = new Window(stage);
 
         stage.show();
+    }
+
+    @Override
+    public void stop() {
+        window.stopRunningThreah();
     }
 }

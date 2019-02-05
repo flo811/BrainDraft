@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  *
@@ -18,7 +20,7 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
 
     protected final Map<Outputable, Double> entriesWeight = new HashMap<>();
     protected double biasWeight;
-    
+
     protected double output;
     protected double error;
 
@@ -46,7 +48,7 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
 
     public abstract void calculateErrorAndUpdateWeight();
 
-    public double getWeightWith(final VirtualNeuron neuron) {
+    public double getWeightWith(final Outputable neuron) {
         return entriesWeight.get(neuron);
     }
 
@@ -83,15 +85,15 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         this.bias = bias;
     }
 
-    public double getEntryWeight(final Outputable entry) {
-        return entriesWeight.get(entry);
-    }
-
     public double getBiasWeight() {
         return biasWeight;
     }
 
     public void setBiasWeight(final double weight) {
         biasWeight = weight;
+    }
+
+    public Set<Entry<Outputable, Double>> getWeights() {
+        return entriesWeight.entrySet();
     }
 }

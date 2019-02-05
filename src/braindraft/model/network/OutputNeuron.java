@@ -19,7 +19,8 @@ public class OutputNeuron extends VirtualNeuron {
     @Override
     public void calculateErrorAndUpdateWeight() {
         error = (expected - output) * activationFunction.getActivationFunction().applyDerivate(weightedSum);
-        entriesWeight.entrySet().forEach(entry -> entry.setValue(learningRate * error * entry.getKey().getOutput()));
+        biasWeight += learningRate * error * bias;
+        entriesWeight.entrySet().forEach(entry -> entry.setValue(entry.getValue() + learningRate * error * entry.getKey().getOutput()));
     }
 
     public double getExpected() {

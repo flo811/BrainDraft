@@ -3,27 +3,24 @@ package braindraft.window.graphicalnetwork;
 import braindraft.model.network.InputNeuron;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Text;
 
 /**
  *
  * @author flo
  */
-public class GraphicalInput extends GraphicalNeuron {
-
-    private final Text output = new Text("0");
+public class GraphicalInput extends GraphicalComponent {
 
     private final InputNeuron neuron;
 
     public GraphicalInput(final InputNeuron neuron) {
-        super();
+        super(new Circle(50, Color.ANTIQUEWHITE));
 
-        getChildren().addAll(new Circle(50, Color.ANTIQUEWHITE), output);
         this.neuron = neuron;
+        actualize();
     }
 
     @Override
     public void actualize() {
-        output.setText(String.valueOf(neuron.getOutput()));
+        output.setText(formatValue(neuron.getOutput()));
     }
 }

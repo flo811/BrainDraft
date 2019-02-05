@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;
+import javafx.scene.control.Alert;
 
 /**
  *
@@ -88,9 +89,9 @@ public class Trainer implements NetworkTrainer {
                     network.getHiddenLayers().forEach(HiddenLayer::updateWeights);
 
                     Platform.runLater(graphicalNetwork::actualize);
-                    
+
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(1);
                     } catch (final InterruptedException ie) {
                         cancel();
                     }
@@ -99,7 +100,13 @@ public class Trainer implements NetworkTrainer {
                 return null;
             }
         };
-        testTask.setOnSucceeded(e -> runningProperty.set(false));
+        testTask.setOnSucceeded(e -> {
+            runningProperty.set(false);
+            toStop = false;
+            final Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText("Network successfully trained !");
+            alert.showAndWait();
+        });
 
         new Thread(testTask).start();
     }
@@ -134,7 +141,19 @@ public class Trainer implements NetworkTrainer {
                 return errors.stream().collect(Collectors.summarizingDouble(x -> x));
             }
         };
-        testTask.setOnSucceeded(e -> runningProperty.set(false));
+        testTask.setOnSucceeded(e -> {
+            try {
+                runningProperty.set(false);
+                toStop = false;
+                final DoubleSummaryStatistics results = testTask.get();
+                final Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("Network successfully tested !");
+                alert.setContentText("Number of tests : " + results.getCount() + "\nMean error = " + results.getAverage());
+                alert.showAndWait();
+            } catch (final Exception ex) {
+                ex.printStackTrace();
+            }
+        });
 
         new Thread(testTask).start();
     }

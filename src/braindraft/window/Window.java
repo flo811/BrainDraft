@@ -51,6 +51,7 @@ public class Window {
 
         menu.setNewItemAction(e -> {
             if (askForSave()) {
+                clean();
                 displayCreateFrame();
             }
         });
@@ -62,10 +63,7 @@ public class Window {
         menu.setSaveItemAction(e -> saveNetwork());
         menu.setCloseItemAction(e -> {
             if (askForSave()) {
-                trainerProperty.set(null);
-                networkProperty.unbind();
-                networkProperty.set(null);
-                modifiedProperty.set(false);
+                clean();
                 displayEmptyFrame();
             }
         });
@@ -76,7 +74,10 @@ public class Window {
         });
         menu.setTrainDataItemAction(e -> {
             try {
-                trainerProperty.get().trainWith(openDatas());
+                final List<Data> datas = openDatas();
+                if (datas != null) {
+                    trainerProperty.get().trainWith(datas);
+                }
             } catch (final Exception ex) {
                 setAlertMessage(ex);
             }
@@ -97,10 +98,14 @@ public class Window {
         menu.setStopItemAction(e -> {
             trainerProperty.get().stop();
             runningProperty.set(false);
+            pausedProperty.set(false);
         });
         menu.setTestDataItemAction(e -> {
             try {
-                trainerProperty.get().testWith(openDatas());
+                final List<Data> datas = openDatas();
+                if (datas != null) {
+                    trainerProperty.get().testWith(datas);
+                }
             } catch (final Exception ex) {
                 setAlertMessage(ex);
             }
@@ -114,6 +119,14 @@ public class Window {
 
         });
         menu.setAboutItemAction(e -> new About());
+    }
+
+    private void clean() {
+        stopRunningThreah();
+        trainerProperty.set(null);
+        networkProperty.unbind();
+        networkProperty.set(null);
+        modifiedProperty.set(false);
     }
 
     private boolean askForSave() {
@@ -134,6 +147,7 @@ public class Window {
     }
 
     private List<Data> openDatas() {
+        fileChooser.getExtensionFilters().clear();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Brain data files", "*.bdata"));
         fileChooser.setInitialFileName("bdatas.bdata");
 
@@ -146,6 +160,7 @@ public class Window {
     }
 
     private void openNetwork() {
+        fileChooser.getExtensionFilters().clear();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Brain files", "*.brain"));
         fileChooser.setInitialFileName("network.brain");
 
@@ -160,6 +175,7 @@ public class Window {
     }
 
     private boolean saveNetwork() {
+        fileChooser.getExtensionFilters().clear();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Brain files", "*.brain"));
         fileChooser.setInitialFileName("network.brain");
 
@@ -207,5 +223,11 @@ public class Window {
         networkProperty.unbind();
         networkProperty.set(network);
         trainerProperty.set(new Trainer(network, networkFrame.getGraphicalNetwork(), runningProperty));
+    }
+
+    public void stopRunningThreah() {
+        if (runningProperty.get()) {
+            trainerProperty.get().stop();
+        }
     }
 }
