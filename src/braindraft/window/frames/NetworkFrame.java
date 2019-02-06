@@ -27,7 +27,7 @@ public final class NetworkFrame extends StackPane {
     private final VBox hiddenHBoxes = new VBox(SPACING);
     private final HBox outputBox = new HBox(SPACING);
 
-    private final VBox networkBox = new VBox(SPACING, inputBox, hiddenHBoxes, outputBox);
+    private final VBox networkBox = new VBox(10, inputBox, hiddenHBoxes, outputBox);
     private final ScrollPane scrollBox = new ScrollPane(networkBox);
 
     private final GraphicalNetwork graphicalNetwork;

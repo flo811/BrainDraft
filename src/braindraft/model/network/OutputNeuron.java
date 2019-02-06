@@ -10,10 +10,10 @@ public class OutputNeuron extends VirtualNeuron {
 
     private double expected;
 
-    public OutputNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
+    public OutputNeuron(final String name, final double weightRangeStartMin, final double weightRangeStartMax,
             final ActivationFunctions activationFunction, final double learningRate,
             final double bias, final Layer<? extends Outputable>... previousLayer) {
-        super(weightRangeStartMin, weightRangeStartMax, activationFunction, learningRate, bias, previousLayer);
+        super(name, weightRangeStartMin, weightRangeStartMax, activationFunction, learningRate, bias, previousLayer);
     }
 
     @Override

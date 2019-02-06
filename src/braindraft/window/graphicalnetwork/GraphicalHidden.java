@@ -13,7 +13,7 @@ public class GraphicalHidden extends GraphicalNeuron {
     public GraphicalHidden(final HiddenNeuron neuron) {
         super(new Rectangle(100, 100, Color.LIGHTGREEN), neuron);
 
-        final Rectangle rectangle = (Rectangle) getChildren().get(0);
+        final Rectangle rectangle = (Rectangle) shape;
         rectangle.setArcWidth(30);
         rectangle.setArcHeight(30);
     }

@@ -136,6 +136,8 @@ public class Trainer implements NetworkTrainer {
 
                     final Data data = testSet.get(i);
                     errors.add(quadraticError(activate(data), data.getOutput()));
+
+                    Platform.runLater(graphicalNetwork::actualize);
                 }
 
                 return errors.stream().collect(Collectors.summarizingDouble(x -> x));
@@ -156,6 +158,16 @@ public class Trainer implements NetworkTrainer {
         });
 
         new Thread(testTask).start();
+    }
+
+    public void predict() {
+        activate(new Data(
+                network.getInputLayer().stream()
+                        .mapToDouble(neuron -> neuron.getOutput())
+                        .toArray(),
+                new double[network.getOutputLayer().size()]
+        ));
+        graphicalNetwork.actualize();
     }
 
     @Override

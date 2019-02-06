@@ -20,7 +20,7 @@ public class GraphicalNeuron extends GraphicalComponent {
     private final VirtualNeuron neuron;
 
     public GraphicalNeuron(final Shape shape, final VirtualNeuron neuron) {
-        super(shape);
+        super(neuron.getName(), shape);
         this.neuron = neuron;
 
         neuron.getWeights().forEach(entry -> weightsMap.put(entry.getKey(), new Text()));
@@ -29,6 +29,20 @@ public class GraphicalNeuron extends GraphicalComponent {
 
         weightsMap.values().forEach(txt -> txt.setFill(Color.SADDLEBROWN));
         biasWeightTxt.setFill(Color.DARKVIOLET);
+
+        if (weightsMap.size() > 4) {
+            biasWeightTxt.setVisible(false);
+            biasWeightTxt.setManaged(false);
+            weightsMap.values().forEach(txt -> {
+                txt.setVisible(false);
+                txt.setManaged(false);
+            });
+        }
+
+        shape.setOnMouseClicked(e -> {
+            new NeuronParametersWindow(neuron).showAndWait();
+            actualize();
+        });
 
         actualize();
     }

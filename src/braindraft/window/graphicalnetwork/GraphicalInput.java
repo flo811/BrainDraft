@@ -12,11 +12,16 @@ public class GraphicalInput extends GraphicalComponent {
 
     private final InputNeuron neuron;
 
-    public GraphicalInput(final InputNeuron neuron) {
-        super(new Circle(50, Color.ANTIQUEWHITE));
+    public GraphicalInput(final InputNeuron input) {
+        super(input.getName(), new Circle(50, Color.ANTIQUEWHITE));
 
-        this.neuron = neuron;
+        this.neuron = input;
         actualize();
+
+        shape.setOnMouseClicked(e -> {
+            new ComponentParametersWindow(input).showAndWait();
+            actualize();
+        });
     }
 
     @Override

@@ -26,9 +26,12 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
 
     protected double weightedSum;
 
-    public VirtualNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
+    private final String name;
+
+    public VirtualNeuron(final String name, final double weightRangeStartMin, final double weightRangeStartMax,
             final ActivationFunctions activationFunction, final double learningRate,
             final double bias, final Layer<? extends Outputable>... previousLayers) {
+        this.name = name;
         this.activationFunction = activationFunction;
         this.learningRate = learningRate;
         this.bias = bias;
@@ -53,8 +56,18 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
     }
 
     @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
     public double getOutput() {
         return output;
+    }
+
+    @Override
+    public void setOutput(final double value) {
+        output = value;
     }
 
     public double getError() {

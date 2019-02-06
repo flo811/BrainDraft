@@ -59,7 +59,9 @@ public final class CreateFrame extends BorderPane {
     private final TextField learningRateTextField = new TextField("0.1");
 
     private final ComboBox<Integer> nbrHiddenCombo = new ComboBox<>(FXCollections.observableArrayList(0, 1, 2, 3, 4, 5, 6));
-    private final ComboBox<ActivationFunctions> activationFunctionCombo;
+    private final ComboBox<ActivationFunctions> activationFunctionCombo = new ComboBox<>(
+            FXCollections.observableArrayList(Arrays.stream(ActivationFunctions.values()).collect(Collectors.toList())
+            ));
 
     private final Button validateButton = new Button("", new ImageView("validate.png"));
 
@@ -96,9 +98,6 @@ public final class CreateFrame extends BorderPane {
         biasTextField.setBorder(getTextFileBorder());
         learningRateTextField.setBorder(getTextFileBorder());
 
-        activationFunctionCombo = new ComboBox<>(FXCollections.observableArrayList(Arrays.stream(ActivationFunctions.values())
-                .collect(Collectors.toList())
-        ));
         activationFunctionBox.getChildren().add(activationFunctionCombo);
 
         inputTextField.textProperty().addListener(getChangeListener(inputTextField, true));
@@ -170,11 +169,11 @@ public final class CreateFrame extends BorderPane {
 
             hiddenTextField.setText("4");
         }
-        
+
         createNetwork();
     }
 
-    private EventHandler<KeyEvent> getOnlyNumValuesHandler() {
+    private static EventHandler<KeyEvent> getOnlyNumValuesHandler() {
         return k -> {
             if (k.getCharacter().matches("[^0-9.]")) {
                 k.consume();

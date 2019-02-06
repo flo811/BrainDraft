@@ -10,10 +10,10 @@ public class HiddenNeuron extends VirtualNeuron {
 
     private Layer<? extends VirtualNeuron> nextLayer;
 
-    public HiddenNeuron(final double weightRangeStartMin, final double weightRangeStartMax,
+    public HiddenNeuron(final String name, final double weightRangeStartMin, final double weightRangeStartMax,
             final ActivationFunctions activationFunction, final double learningRate,
             final double bias, final Layer<? extends Outputable>... previousLayers) {
-        super(weightRangeStartMin, weightRangeStartMax, activationFunction, learningRate, bias, previousLayers);
+        super(name, weightRangeStartMin, weightRangeStartMax, activationFunction, learningRate, bias, previousLayers);
     }
 
     @Override

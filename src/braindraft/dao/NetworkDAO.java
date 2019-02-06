@@ -17,6 +17,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -35,25 +36,28 @@ public final class NetworkDAO {
 
         final List<InputNeuron> inputs = IntStream
                 .range(0, inputNbr)
-                .mapToObj(i -> new InputNeuron())
+                .mapToObj(i -> new InputNeuron("Input " + (i + 1)))
                 .collect(Collectors.toList());
         final InputLayer inputLayer = new InputLayer(inputs);
 
         final LinkedList<HiddenLayer> hiddenLayers = new LinkedList<>();
+        final AtomicInteger layerNbr = new AtomicInteger(0);
         for (final int nbr : hiddenNbrs) {
+            layerNbr.addAndGet(1);
             final List<HiddenNeuron> hidden = IntStream
                     .range(0, nbr)
-                    .mapToObj(i -> new HiddenNeuron(weightRangeStartMin, weightRangeStartMax,
-                    activationFunction, learningRate, bias,
-                    hiddenLayers.isEmpty() ? inputLayer : hiddenLayers.getLast()))
+                    .mapToObj(i -> new HiddenNeuron("Hidden " + layerNbr.get() + "-" + (i + 1),
+                    weightRangeStartMin, weightRangeStartMax, activationFunction, learningRate,
+                    bias, hiddenLayers.isEmpty() ? inputLayer : hiddenLayers.getLast()))
                     .collect(Collectors.toList());
             hiddenLayers.add(new HiddenLayer(hidden));
         }
 
         final OutputLayer outputLayer = new OutputLayer(
                 IntStream.range(0, outputNbr)
-                        .mapToObj(i -> new OutputNeuron(weightRangeStartMin, weightRangeStartMax, activationFunction,
-                        learningRate, bias, hiddenLayers.isEmpty() ? inputLayer : hiddenLayers.getLast()))
+                        .mapToObj(i -> new OutputNeuron("Output " + (i + 1), weightRangeStartMin,
+                        weightRangeStartMax, activationFunction, learningRate, bias,
+                        hiddenLayers.isEmpty() ? inputLayer : hiddenLayers.getLast()))
                         .collect(Collectors.toList())
         );
 

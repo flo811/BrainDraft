@@ -6,5 +6,9 @@ package braindraft.model.network;
  */
 public interface Outputable {
 
+    String getName();
+
     double getOutput();
+
+    void setOutput(double value);
 }

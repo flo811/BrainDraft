@@ -114,9 +114,7 @@ public class Window {
             trainerProperty.get().test();
             runningProperty.set(true);
         });
-        menu.setPredictItemAction(e -> {
-
-        });
+        menu.setPredictItemAction(e -> trainerProperty.get().predict());
         menu.setAboutItemAction(e -> new About());
     }
 
