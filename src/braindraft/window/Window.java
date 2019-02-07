@@ -2,13 +2,12 @@ package braindraft.window;
 
 import braindraft.dao.NetworkDAO;
 import braindraft.model.Trainer;
-import braindraft.model.dataset.Data;
+import braindraft.model.dataset.DataSet;
 import braindraft.model.network.Network;
 import braindraft.window.frames.CreateFrame;
 import braindraft.window.frames.EmptyFrame;
 import braindraft.window.frames.NetworkFrame;
 import java.io.File;
-import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -38,9 +37,10 @@ public class Window {
             modifiedProperty, runningProperty, pausedProperty);
 
     private final BorderPane root = new BorderPane(null, menu, null, null, null);
+    private final Scene scene = new Scene(root);
 
     public Window(final Stage stage) {
-        stage.setScene(new Scene(root));
+        stage.setScene(scene);
         stage.setOnCloseRequest(e -> askForSave());
 
         fileChooser.setTitle("Choose a location");
@@ -73,7 +73,7 @@ public class Window {
         });
         menu.setTrainDataItemAction(e -> {
             try {
-                final List<Data> datas = openDatas();
+                final DataSet datas = openDatas();
                 if (datas != null) {
                     trainerProperty.get().trainWith(datas);
                 }
@@ -101,7 +101,7 @@ public class Window {
         });
         menu.setTestDataItemAction(e -> {
             try {
-                final List<Data> datas = openDatas();
+                final DataSet datas = openDatas();
                 if (datas != null) {
                     trainerProperty.get().testWith(datas);
                 }
@@ -142,17 +142,20 @@ public class Window {
         return true;
     }
 
-    private List<Data> openDatas() {
+    private DataSet openDatas() {
         fileChooser.getExtensionFilters().clear();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Brain data files", "*.bdata"));
         fileChooser.setInitialFileName("bdatas.bdata");
 
+        DataSet dataSet;
         try {
-            return NetworkDAO.openDataSet(fileChooser.showOpenDialog(root.getScene().getWindow()));
+            dataSet = NetworkDAO.openDataSet(fileChooser.showOpenDialog(root.getScene().getWindow()));
         } catch (final Exception ex) {
             setAlertMessage(ex);
-            return null;
+            dataSet = null;
         }
+
+        return dataSet;
     }
 
     private void openNetwork() {

@@ -38,8 +38,8 @@ public class Trainer implements NetworkTrainer {
         this.runningProperty = runningProperty;
     }
 
-    public void trainWith(final List<Data> datas) throws Exception {
-        trainSet = new DataSet(datas);
+    public void trainWith(final DataSet datas) throws Exception {
+        trainSet = datas;
 
         if (trainSet.getInputSize() != network.getInputLayer().size() || trainSet.getOutputSize() != network.getOutputLayer().size()) {
             trainSet = null;
@@ -47,8 +47,8 @@ public class Trainer implements NetworkTrainer {
         }
     }
 
-    public void testWith(final List<Data> datas) throws Exception {
-        testSet = new DataSet(datas);
+    public void testWith(final DataSet datas) throws Exception {
+        testSet = datas;
 
         if (testSet.getInputSize() != network.getInputLayer().size() || testSet.getOutputSize() != network.getOutputLayer().size()) {
             testSet = null;
@@ -100,6 +100,7 @@ public class Trainer implements NetworkTrainer {
                 return null;
             }
         };
+
         testTask.setOnSucceeded(e -> {
             runningProperty.set(false);
             toStop = false;
@@ -121,6 +122,7 @@ public class Trainer implements NetworkTrainer {
                 }
 
                 final List<Double> errors = new ArrayList<>();
+                final ValidationRule sortingRule = testSet.getSortingRule();
 
                 for (int i = 0; i < testSet.size(); i++) {
                     while (inPause) {
@@ -135,14 +137,25 @@ public class Trainer implements NetworkTrainer {
                     }
 
                     final Data data = testSet.get(i);
-                    errors.add(quadraticError(activate(data), data.getOutput()));
+                    if (sortingRule != null) {
+                        errors.add(sortingRule.apply(activate(data), data.getOutput()) ? 1.0 : 0.0);
+                    } else {
+                        errors.add(quadraticError(activate(data), data.getOutput()));
+                    }
 
                     Platform.runLater(graphicalNetwork::actualize);
+
+                   // try {
+                     //   Thread.sleep(1);
+                    //} catch (final InterruptedException ie) {
+                   //     cancel();
+                    //}
                 }
 
                 return errors.stream().collect(Collectors.summarizingDouble(x -> x));
             }
         };
+
         testTask.setOnSucceeded(e -> {
             try {
                 runningProperty.set(false);
@@ -150,7 +163,15 @@ public class Trainer implements NetworkTrainer {
                 final DoubleSummaryStatistics results = testTask.get();
                 final Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setHeaderText("Network successfully tested !");
-                alert.setContentText("Number of tests : " + results.getCount() + "\nMean error = " + results.getAverage());
+                if (testSet.getSortingRule() == null) {
+                    alert.setContentText("Number of tests : " + results.getCount() + "\nMean error = " + results.getAverage());
+                } else {
+                    final int totNbr = (int) results.getCount();
+                    final int okNbr = (int) results.getSum();
+                    final int okPercent = (int) (100 * results.getAverage());
+                    alert.setContentText("Number of tests : " + totNbr + "\nOK = " + okNbr + " (" + okPercent + "%)"
+                            + "\nKO = " + (totNbr - okNbr) + " (" + (100 - okPercent) + "%)");
+                }
                 alert.showAndWait();
             } catch (final Exception ex) {
                 ex.printStackTrace();

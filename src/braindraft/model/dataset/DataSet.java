@@ -1,5 +1,7 @@
 package braindraft.model.dataset;
 
+import braindraft.model.ValidationRule;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -9,18 +11,21 @@ import java.util.stream.Stream;
  *
  * @author flo
  */
-public class DataSet {
+public class DataSet implements Serializable {
 
     private final List<Data> dataSet = new ArrayList<>();
 
     private final int inputSize;
     private final int outputSize;
 
-    public DataSet(final List<Data> datas) throws Exception {
+    private final ValidationRule sortingRule;
+
+    public DataSet(final List<Data> datas, final ValidationRule sortingRule) throws Exception {
         if (datas.isEmpty()) {
             throw new Exception("Dataset is empty !");
         }
 
+        this.sortingRule = sortingRule;
         inputSize = datas.get(0).getInput().length;
         outputSize = datas.get(0).getOutput().length;
 
@@ -57,5 +62,9 @@ public class DataSet {
 
     public int getOutputSize() {
         return outputSize;
+    }
+
+    public ValidationRule getSortingRule() {
+        return sortingRule;
     }
 }
