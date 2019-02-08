@@ -85,8 +85,16 @@ public class Trainer implements NetworkTrainer {
                         outputNeurons.get(j).setExpected(data.getOutput()[j]);
                     }
 
-                    network.getOutputLayer().updateWeights();
-                    network.getHiddenLayers().forEach(HiddenLayer::updateWeights);
+                    network.getOutputLayer().calculateDeltas();
+                    final List<HiddenLayer> hiddenLayers = network.getHiddenLayers();
+                    for (int j = hiddenLayers.size() - 1; j >= 0; j--) {
+                        hiddenLayers.get(j).calculateDeltas();
+                    }
+
+                    network.getOutputLayer().forEach(OutputNeuron::updateWeights);
+                    for (int j = hiddenLayers.size() - 1; j >= 0; j--) {
+                        hiddenLayers.get(j).updateWeights();
+                    }
 
                     Platform.runLater(graphicalNetwork::actualize);
 
@@ -145,11 +153,11 @@ public class Trainer implements NetworkTrainer {
 
                     Platform.runLater(graphicalNetwork::actualize);
 
-                   // try {
-                     //   Thread.sleep(1);
-                    //} catch (final InterruptedException ie) {
-                   //     cancel();
-                    //}
+                    try {
+                        Thread.sleep(1);
+                    } catch (final InterruptedException ie) {
+                        cancel();
+                    }
                 }
 
                 return errors.stream().collect(Collectors.summarizingDouble(x -> x));

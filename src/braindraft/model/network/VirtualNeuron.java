@@ -22,9 +22,9 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
     protected double biasWeight;
 
     protected double output;
-    protected double error;
 
     protected double weightedSum;
+    protected double delta;
 
     private final String name;
 
@@ -49,7 +49,12 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         output = activationFunction.getActivationFunction().apply(weightedSum);
     }
 
-    public abstract void calculateErrorAndUpdateWeight();
+    public abstract void calculateDelta();
+
+    public void updateWeights() {
+        biasWeight += learningRate * delta * bias;
+        entriesWeight.entrySet().forEach(entry -> entry.setValue(entry.getValue() + learningRate * delta * entry.getKey().getOutput()));
+    }
 
     public double getWeightWith(final Outputable neuron) {
         return entriesWeight.get(neuron);
@@ -70,8 +75,8 @@ public abstract class VirtualNeuron implements Outputable, Serializable {
         output = value;
     }
 
-    public double getError() {
-        return error;
+    public double getDelta() {
+        return delta;
     }
 
     public ActivationFunctions getActivationFunction() {

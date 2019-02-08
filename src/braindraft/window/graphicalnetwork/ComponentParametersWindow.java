@@ -74,7 +74,7 @@ public class ComponentParametersWindow extends ScrollPane {
 
     protected static EventHandler<KeyEvent> getOnlyNumValuesHandler() {
         return k -> {
-            if (k.getCharacter().matches("[^0-9.]")) {
+            if (k.getCharacter().matches("[^0-9.-]")) {
                 k.consume();
             }
         };

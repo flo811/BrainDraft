@@ -21,11 +21,15 @@ public class OutputLayer extends Layer<OutputNeuron> {
         for (int i = 0; i < neurons.size(); i++) {
             outputs[i] = neurons.get(i).getOutput();
         }
-        
+
         return outputs;
     }
-    
-    public void updateWeights(){
-        forEach(OutputNeuron::calculateErrorAndUpdateWeight);
+
+    public void calculateDeltas() {
+        forEach(OutputNeuron::calculateDelta);
+    }
+
+    public void updateWeights() {
+        forEach(OutputNeuron::updateWeights);
     }
 }
